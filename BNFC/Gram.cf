@@ -1,0 +1,94 @@
+entrypoints Program ;
+
+Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
+
+SBlock.		Block 		::=     "{" [St] "}" ;
+SRBlock. 	RBlock 		::=     "{" [St] "return" Expression ";" "}" ;
+
+Declr.          Decl    ::=     Type Identifier ;
+DAssign.        Decl    ::=     Type Identifier "=" Expression ;
+DConstDec.      Decl    ::=     "const" Type Identifier "=" Expression ;
+
+terminator      Decl ";" ;
+
+TDef.       TypeDeclaration     ::=     "type" Identifier "is" Type ";" ;
+
+terminator  TypeDeclaration "" ;
+
+FDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" Type  RBlock ;
+PDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" "void" Block ;
+
+terminator  FunctionDeclaration "" ;
+
+Cargs.      CallArgs            ::=     Expression ;
+Args.       Arguments           ::=     Type Identifier ;
+
+separator   CallArgs    "," ;
+separator   Arguments   "," ;
+
+SDec.       St      ::=     Decl ";" ;
+SAssign.    St      ::=     Assignment ";"   ;
+SExp.       St      ::=     Expression ";"   ;
+SWhile.     St      ::=     "while" "(" Exp ")" Block ;
+SFor.       St      ::=     "from" Exp "to" Exp "as" Ident "do" Block;
+SGuard.     St      ::=     "guard" "(" [Identifier] ")" "in" Block ;
+SIf.        St      ::=     If ;
+SIfE.       St      ::=     If "else" Block ;
+
+terminator St "" ;
+
+If.         If      ::=     "if (" Exp ")" Block [EIf] ;
+SEIf.       EIf     ::=     "else if (" Exp ")" Block  ;
+
+terminator EIf "" ;
+
+Exp.        Expression  ::=     Exp  ;
+
+Eor.     Exp  ::= Exp "||" Exp1 ;
+Eand.    Exp  ::= Exp "&&" Exp1 ;
+Eeq.     Exp1 ::= Exp1 "=="  Exp2 ;
+Elt.     Exp2 ::= Exp2 "<"  Exp3 ;
+Egt.     Exp2 ::= Exp2 ">"  Exp3 ;
+
+EAdd.    Exp3 ::= Exp3 "+" Exp4 ;
+ESub.    Exp3 ::= Exp3 "-" Exp4 ;
+EMul.    Exp4 ::= Exp4 "*" Exp5 ;
+EDiv.    Exp4 ::= Exp4 "/" Exp5 ;
+EMinus.  Exp5 ::= "-" Exp6 ;
+
+Call.    Exp6 ::= Identifier "(" [CallArgs] ")"  ;
+EVar.    Exp6 ::= Identifier    ;
+EInt.    Exp6 ::= Integer       ;
+Etrue.   Exp6 ::= "true"        ;
+Efalse.  Exp6 ::= "false"       ;
+
+coercions Exp 6 ;
+
+Assign.         Assignment      ::=     Identifier "=" Expression ;
+AArith.         Assignment      ::=     Identifier ArAssign Expression ;
+AIncDec.        Assignment      ::=     Identifier IncDec ;
+
+TInt.           Type            ::=     "int" ;
+TBool.          Type            ::=     "bool" ;
+
+Id.             Identifier      ::=     Ident ;
+
+separator nonempty Identifier  "," ;
+
+AAPlus.         ArAssign        ::=     "+=" ;
+AAMinus.        ArAssign        ::=     "-=" ;
+AAMulti.        ArAssign        ::=     "*=" ;
+AADiv.          ArAssign        ::=     "/=" ;
+
+Increment.      IncDec          ::=     "++" ;
+Decrement.      IncDec          ::=     "--" ;
+
+comment "#" ;
+
+{-
+CompG.          ComparisonOperator      ::=     ">"  ;
+CompL.          ComparisonOperator      ::=     "<"  ;
+CompE.          ComparisonOperator      ::=     "==" ;
+LogA.           LogicalOperator         ::=     "&&" ;
+LogO.           LogicalOperator         ::=     "||" ;
+-}
