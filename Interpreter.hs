@@ -227,53 +227,6 @@ execProgram p = do
 
     print finalState
 
--- Przykładowe programy
---exp1 = EAdd (EInt 2) (EInt 3)
---
---xplus1 = (EAdd (EVar (Id (Ident "x"))) (EInt 1))
---
---prog1 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] []
---
---prog2 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) xplus1]
---
---prog4 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
---    [SIf (EVar (Id (Ident "x")))
---      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
---      (SBlock [] [SSkip])]
---
---prog4a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
---    [SIf (EVar (Id (Ident "x")))
---      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
---      (SBlock [] [SSkip])]
---
----- powinno wyjść x=3
---prog5 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
---    [SIf (EVar (Id (Ident "x")))
---      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
---      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
---
----- powinno wyjść x=1
---prog5a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
---    [SIf (EVar (Id (Ident "x")))
---      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
---      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
---
---
---progW =
---  (SBlock
---    [DVar (TInt) (Id (Ident "x")) (EInt 3), DVar (TInt) (Id (Ident "y")) (EInt 0)]
---    [SWhile (EVar (Id (Ident "x")))
---        (SBlock []
---          [SAssign (Id (Ident "y")) (EAdd (EVar (Id (Ident "y"))) (EVar (Id (Ident "x")))),
---           SAssign (Id (Ident "x")) (ESub (EVar (Id (Ident "x"))) (EInt 1))])]
---  )
---
---loop = SWhile (EInt 1) (SBlock [] [SSkip])
---
---test = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))]
---
---testP = Prog [] [] [] (SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))])
-
 test1 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EAdd (EVar (Id (Ident "x"))) (EInt 5)))),SAssign (Assign (Id (Ident "y")) (Exp Efalse))])
 
 test2 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 5)))])
