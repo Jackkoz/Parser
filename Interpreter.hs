@@ -64,8 +64,8 @@ data Decl =
 
 data Assignment =
       Assign Identifier Expression
---    | AArith Identifier ArAssign Expression
---    | AIncDec Identifier IncDec
+    | AArith Identifier ArAssign Expression
+    | AIncDec Identifier IncDec
     deriving (Eq,Ord,Show)
 
 data Type =
@@ -78,6 +78,18 @@ newtype Ident = Ident String
 
 data Identifier = Id Ident
     deriving (Eq,Ord,Show)
+
+data ArAssign =
+   AAPlus
+ | AAMinus
+ | AAMulti
+ | AADiv
+  deriving (Eq,Ord,Show)
+
+data IncDec =
+   Increment
+ | Decrement
+  deriving (Eq,Ord,Show)
 
 type Loc = Int -- lokacja
 type Env = M.Map String Loc -- środowisko
@@ -190,6 +202,40 @@ interpretA (Assign id exp) = do
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     modify (M.insert loc val)
+
+interpretA (AArith id AAPlus exp) = do
+    val1 <- evalE exp
+    Just loc <-asks (M.lookup (evalId id))
+    Just val2 <- gets (M.lookup loc)
+    modify (M.insert loc (val1 + val2))
+
+interpretA (AArith id AAMinus exp) = do
+    val1 <- evalE exp
+    Just loc <-asks (M.lookup (evalId id))
+    Just val2 <- gets (M.lookup loc)
+    modify (M.insert loc (val2 - val1))
+
+interpretA (AArith id AAMulti exp) = do
+    val1 <- evalE exp
+    Just loc <-asks (M.lookup (evalId id))
+    Just val2 <- gets (M.lookup loc)
+    modify (M.insert loc (val1 * val2))
+
+interpretA (AArith id AADiv exp) = do
+    val1 <- evalE exp
+    Just loc <-asks (M.lookup (evalId id))
+    Just val2 <- gets (M.lookup loc)
+    modify (M.insert loc (div val1  val2))
+
+interpretA (AIncDec id Increment) = do
+    Just loc <-asks (M.lookup (evalId id))
+    Just val <- gets (M.lookup loc)
+    modify (M.insert loc (val + 1))
+
+interpretA (AIncDec id Decrement) = do
+    Just loc <-asks (M.lookup (evalId id))
+    Just val <- gets (M.lookup loc)
+    modify (M.insert loc (val - 1))
 
 interpret :: Stmt -> Semantics ()
 interpret SSkip = return ()
