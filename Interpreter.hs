@@ -2,6 +2,35 @@ import Data.Map as M
 import Control.Monad.Reader
 import Control.Monad.State
 
+data Program =
+   Prog [TypeDeclaration] [Decl] [FunctionDeclaration] Block
+  deriving (Eq,Ord,Show)
+
+data TypeDeclaration =
+   TDef Identifier Type
+  deriving (Eq,Ord,Show)
+
+data FunctionDeclaration =
+   FDec Identifier [Arguments] Type RBlock
+ | PDec Identifier [Arguments] Block
+  deriving (Eq,Ord,Show)
+
+data CallArgs =
+   Cargs Exp
+  deriving (Eq,Ord,Show)
+
+data Arguments =
+   Args Type Identifier
+  deriving (Eq,Ord,Show)
+
+data Block =
+    SBlock [Decl] [Stmt]
+    deriving (Eq,Ord,Show)
+
+data RBlock =
+    SRBlock [Decl] [Stmt] Exp
+    deriving (Eq,Ord,Show)
+
 data Exp = EInt Int
     | EAdd Exp Exp
     | ESub Exp Exp
@@ -15,9 +44,10 @@ data Exp = EInt Int
 
 data Stmt = SSkip
     | SAssign Identifier Exp
-    | SIf Exp Stmt Stmt
-    | SWhile Exp Stmt
-    | SBlock [Decl] [Stmt]
+    | SIf Exp Block Block
+    | SWhile Exp Block
+--    | SBlock [Decl] [Stmt]
+    deriving (Eq,Ord,Show)
      
 data Decl =
       Declr   Type Identifier
@@ -126,30 +156,37 @@ evalDecls (decl:decls) = do
   env' <- evalDecl decl
   local (const env') (evalDecls decls)
 
+interpretProgram :: Progrma
+
+interpretB :: Block -> Semantics ()
+interpretB (SBlock decls stmts) = do
+    env' <- evalDecls decls
+    local (const env') (mapM_ interpret stmts)
+
 interpret :: Stmt -> Semantics ()
 interpret SSkip = return ()
 
-interpret (SBlock decls stmts) = do
-  env' <- evalDecls decls
-  local (const env') (mapM_ interpret stmts)
+--interpret (SBlock decls stmts) = do
+--  env' <- evalDecls decls
+--  local (const env') (mapM_ interpret stmts)
 
 interpret (SAssign id expr) = do
   val <- eval expr
   Just loc <-asks (M.lookup (evalId id))
   modify (M.insert loc val)
 
-interpret (SIf bexpr stmt1 stmt2) = do
+interpret (SIf bexpr block1 block2) = do
   bval <- eval bexpr
   if bval == 0
-     then interpret stmt2
-     else interpret stmt1
+     then interpretB block2
+     else interpretB block1
 
-interpret this@(SWhile bexpr stmt) = do
+interpret this@(SWhile bexpr block) = do
   bval <- eval bexpr
   if bval == 0
      then return ()
      else do
-       interpret stmt
+       interpretB block
        interpret this
 
 execStmt :: Stmt -> IO ()
@@ -170,24 +207,24 @@ prog2 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x"))
 prog4 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
     [SIf (EVar (Id (Ident "x")))
       (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
-      SSkip]
+      (SBlock [] [SSkip])]
 
 prog4a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
     [SIf (EVar (Id (Ident "x")))
       (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
-      SSkip]
+      (SBlock [] [SSkip])]
 
 -- powinno wyjść x=3
 prog5 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
     [SIf (EVar (Id (Ident "x")))
       (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
-      (SAssign (Id (Ident "x")) xplus1)]
+      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
 
 -- powinno wyjść x=1
 prog5a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
     [SIf (EVar (Id (Ident "x")))
       (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
-      (SAssign (Id (Ident "x")) xplus1)]
+      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
 
 
 progW =
@@ -199,6 +236,6 @@ progW =
            SAssign (Id (Ident "x")) (ESub (EVar (Id (Ident "x"))) (EInt 1))])]
   )
 
-loop = SWhile (EInt 1) SSkip
+loop = SWhile (EInt 1) (SBlock [] [SSkip])
 
 test = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))]
