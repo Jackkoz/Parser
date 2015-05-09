@@ -22,7 +22,7 @@ data Stmt = SSkip
 data Decl =
       Declr   Type Identifier
     | DVar    Type Identifier Exp
-    | DConstDec Type Identifier Exp
+    -- | DConstDec Type Identifier Exp
     deriving (Eq,Ord,Show)
 
 data Type =
@@ -97,18 +97,26 @@ eval (Efalse) = return 0
 
 evalExp :: Exp -> Int
 evalExp expr =
-  let readerStuff = eval expr in
-  let stateStuff = runReaderT readerStuff emptyEnv in
-  evalState stateStuff initialSt
+    let readerStuff = eval expr in
+    let stateStuff = runReaderT readerStuff emptyEnv in
+    evalState stateStuff initialSt
 
 evalDecl :: Decl -> Semantics Env
 evalDecl (DVar t id expr) = do
-  Just newLoc <- gets (M.lookup 0)
-  val <- eval expr
-  modify (M.insert newLoc val)
-  modify (M.insert 0 (newLoc+1))
-  env <- ask
-  return $ M.insert (evalId(id)) newLoc env
+    Just newLoc <- gets (M.lookup 0)
+    val <- eval expr
+    modify (M.insert newLoc val)
+    modify (M.insert 0 (newLoc+1))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
+evalDecl (Declr t id) = do
+    Just newLoc <- gets (M.lookup 0)
+    -- initialize to 0
+    modify (M.insert newLoc 0)
+    modify (M.insert 0 (newLoc+1))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
+
 -- można też asks M.insert var newLoc
 
 -- Dodatkowa zabawa, aby druga deklaracja z listy mogla juz uzywac pierwszej zmiennej
