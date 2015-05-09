@@ -16,7 +16,7 @@ data FunctionDeclaration =
   deriving (Eq,Ord,Show)
 
 data CallArgs =
-   Cargs Exp
+   Cargs Expression
   deriving (Eq,Ord,Show)
 
 data Arguments =
@@ -28,10 +28,15 @@ data Block =
     deriving (Eq,Ord,Show)
 
 data RBlock =
-    SRBlock [Decl] [Stmt] Exp
+    SRBlock [Decl] [Stmt] Expression
     deriving (Eq,Ord,Show)
 
-data Exp = EInt Int
+data Expression =
+    Exp Exp
+    deriving (Eq,Ord,Show)
+
+data Exp =
+      EInt Int
     | EAdd Exp Exp
     | ESub Exp Exp
     | EMul Exp Exp
@@ -43,16 +48,24 @@ data Exp = EInt Int
     deriving (Eq,Ord,Show)
 
 data Stmt = SSkip
-    | SAssign Identifier Exp
-    | SIf Exp Block Block
-    | SWhile Exp Block
+    | SAssign Assignment
+    | SIf Expression Block Block
+    | SWhile Expression Block
+--    | SExp Exp
 --    | SBlock [Decl] [Stmt]
     deriving (Eq,Ord,Show)
      
 data Decl =
       Declr   Type Identifier
-    | DVar    Type Identifier Exp
+    | DAssign    Type Identifier Expression
+--    | SDec
     -- | DConstDec Type Identifier Exp
+    deriving (Eq,Ord,Show)
+
+data Assignment =
+      Assign Identifier Expression
+--    | AArith Identifier ArAssign Expression
+--    | AIncDec Identifier IncDec
     deriving (Eq,Ord,Show)
 
 data Type =
@@ -97,6 +110,10 @@ takeValue loc = do
   Just val <- gets (M.lookup loc)
   return val
 
+evalE :: Expression -> Semantics Int
+evalE (Exp exp) = do
+    eval exp
+
 eval :: Exp -> Semantics Int
 eval (EInt i) = return i
 eval (EVar id) = do
@@ -132,9 +149,9 @@ evalExp expr =
     evalState stateStuff initialSt
 
 evalDecl :: Decl -> Semantics Env
-evalDecl (DVar t id expr) = do
+evalDecl (DAssign t id expr) = do
     Just newLoc <- gets (M.lookup 0)
-    val <- eval expr
+    val <- evalE expr
     modify (M.insert newLoc val)
     modify (M.insert 0 (newLoc+1))
     env <- ask
@@ -166,27 +183,31 @@ interpretB (SBlock decls stmts) = do
     env' <- evalDecls decls
     local (const env') (mapM_ interpret stmts)
 
+interpretA :: Assignment -> Semantics ()
+interpretA (Assign id exp) = do
+    val <- evalE exp
+    Just loc <-asks (M.lookup (evalId id))
+    modify (M.insert loc val)
+
 interpret :: Stmt -> Semantics ()
 interpret SSkip = return ()
 
-interpret (SAssign id expr) = do
-  val <- eval expr
-  Just loc <-asks (M.lookup (evalId id))
-  modify (M.insert loc val)
+interpret (SAssign a) = do
+    interpretA a
 
-interpret (SIf bexpr block1 block2) = do
-  bval <- eval bexpr
+interpret (SIf exp block1 block2) = do
+  bval <- evalE exp
   if bval == 0
      then interpretB block2
      else interpretB block1
 
-interpret this@(SWhile bexpr block) = do
-  bval <- eval bexpr
-  if bval == 0
-     then return ()
-     else do
-       interpretB block
-       interpret this
+interpret this@(SWhile exp block) = do
+    bval <- evalE exp
+    if bval == 0
+        then return ()
+        else do
+            interpretB block
+            interpret this
 
 execStmt :: Stmt -> IO ()
 execStmt stmt = do
@@ -207,48 +228,53 @@ execProgram p = do
     print finalState
 
 -- Przykładowe programy
-exp1 = EAdd (EInt 2) (EInt 3)
+--exp1 = EAdd (EInt 2) (EInt 3)
+--
+--xplus1 = (EAdd (EVar (Id (Ident "x"))) (EInt 1))
+--
+--prog1 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] []
+--
+--prog2 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) xplus1]
+--
+--prog4 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
+--    [SIf (EVar (Id (Ident "x")))
+--      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
+--      (SBlock [] [SSkip])]
+--
+--prog4a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
+--    [SIf (EVar (Id (Ident "x")))
+--      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
+--      (SBlock [] [SSkip])]
+--
+---- powinno wyjść x=3
+--prog5 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
+--    [SIf (EVar (Id (Ident "x")))
+--      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
+--      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
+--
+---- powinno wyjść x=1
+--prog5a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
+--    [SIf (EVar (Id (Ident "x")))
+--      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
+--      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
+--
+--
+--progW =
+--  (SBlock
+--    [DVar (TInt) (Id (Ident "x")) (EInt 3), DVar (TInt) (Id (Ident "y")) (EInt 0)]
+--    [SWhile (EVar (Id (Ident "x")))
+--        (SBlock []
+--          [SAssign (Id (Ident "y")) (EAdd (EVar (Id (Ident "y"))) (EVar (Id (Ident "x")))),
+--           SAssign (Id (Ident "x")) (ESub (EVar (Id (Ident "x"))) (EInt 1))])]
+--  )
+--
+--loop = SWhile (EInt 1) (SBlock [] [SSkip])
+--
+--test = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))]
+--
+--testP = Prog [] [] [] (SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))])
 
-xplus1 = (EAdd (EVar (Id (Ident "x"))) (EInt 1))
+test1 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EAdd (EVar (Id (Ident "x"))) (EInt 5)))),SAssign (Assign (Id (Ident "y")) (Exp Efalse))])
 
-prog1 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] []
+test2 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 5)))])
 
-prog2 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) xplus1]
-
-prog4 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
-    [SIf (EVar (Id (Ident "x")))
-      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
-      (SBlock [] [SSkip])]
-
-prog4a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
-    [SIf (EVar (Id (Ident "x")))
-      (SBlock [DVar (TInt) (Id (Ident "y")) (EVar (Id (Ident "x")))] [])
-      (SBlock [] [SSkip])]
-
--- powinno wyjść x=3
-prog5 = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)]
-    [SIf (EVar (Id (Ident "x")))
-      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
-      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
-
--- powinno wyjść x=1
-prog5a = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 0)]
-    [SIf (EVar (Id (Ident "x")))
-      (SBlock [DVar (TInt) (Id (Ident "x")) xplus1] [SAssign (Id (Ident "x")) xplus1])
-      (SBlock [] [SAssign (Id (Ident "x")) xplus1])]
-
-
-progW =
-  (SBlock
-    [DVar (TInt) (Id (Ident "x")) (EInt 3), DVar (TInt) (Id (Ident "y")) (EInt 0)]
-    [SWhile (EVar (Id (Ident "x")))
-        (SBlock []
-          [SAssign (Id (Ident "y")) (EAdd (EVar (Id (Ident "y"))) (EVar (Id (Ident "x")))),
-           SAssign (Id (Ident "x")) (ESub (EVar (Id (Ident "x"))) (EInt 1))])]
-  )
-
-loop = SWhile (EInt 1) (SBlock [] [SSkip])
-
-test = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))]
-
-testP = Prog [] [] [] (SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))])
