@@ -156,7 +156,10 @@ evalDecls (decl:decls) = do
   env' <- evalDecl decl
   local (const env') (evalDecls decls)
 
-interpretProgram :: Progrma
+interpretP :: Program -> Semantics ()
+interpretP (Prog typeD decls funD b) = do
+    env' <- evalDecls decls
+    interpretB b
 
 interpretB :: Block -> Semantics ()
 interpretB (SBlock decls stmts) = do
@@ -165,10 +168,6 @@ interpretB (SBlock decls stmts) = do
 
 interpret :: Stmt -> Semantics ()
 interpret SSkip = return ()
-
---interpret (SBlock decls stmts) = do
---  env' <- evalDecls decls
---  local (const env') (mapM_ interpret stmts)
 
 interpret (SAssign id expr) = do
   val <- eval expr
@@ -194,6 +193,18 @@ execStmt stmt = do
   let ((), finalState) =  runState (runReaderT (interpret stmt) emptyEnv) initialSt
 
   print finalState
+
+execBlock :: Block -> IO ()
+execBlock b = do
+    let ((), finalState) =  runState (runReaderT (interpretB b) emptyEnv) initialSt
+
+    print finalState
+
+execProgram :: Program -> IO ()
+execProgram p = do
+    let ((), finalState) =  runState (runReaderT (interpretP p) emptyEnv) initialSt
+
+    print finalState
 
 -- Przykładowe programy
 exp1 = EAdd (EInt 2) (EInt 3)
@@ -239,3 +250,5 @@ progW =
 loop = SWhile (EInt 1) (SBlock [] [SSkip])
 
 test = SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))]
+
+testP = Prog [] [] [] (SBlock [DVar (TInt) (Id (Ident "x")) (EInt 3)] [SAssign (Id (Ident "x")) (EAdd (EVar (Id (Ident "x"))) (EInt 1))])
