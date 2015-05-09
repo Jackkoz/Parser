@@ -209,17 +209,17 @@ interpret this@(SWhile exp block) = do
             interpretB block
             interpret this
 
-execStmt :: Stmt -> IO ()
-execStmt stmt = do
-  let ((), finalState) =  runState (runReaderT (interpret stmt) emptyEnv) initialSt
-
-  print finalState
-
-execBlock :: Block -> IO ()
-execBlock b = do
-    let ((), finalState) =  runState (runReaderT (interpretB b) emptyEnv) initialSt
-
-    print finalState
+--execStmt :: Stmt -> IO ()
+--execStmt stmt = do
+--  let ((), finalState) =  runState (runReaderT (interpret stmt) emptyEnv) initialSt
+--
+--  print finalState
+--
+--execBlock :: Block -> IO ()
+--execBlock b = do
+--    let ((), finalState) =  runState (runReaderT (interpretB b) emptyEnv) initialSt
+--
+--    print finalState
 
 execProgram :: Program -> IO ()
 execProgram p = do
