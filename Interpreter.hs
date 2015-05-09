@@ -136,6 +136,8 @@ eval (EDiv exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
     return (div val1 val2)
+--eval (EMinus Etrue)  = return 0
+--eval (EMinus Efalse) = return 1
 eval (EMinus exp) = do
     val <- eval exp
     return (-val)
