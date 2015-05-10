@@ -2,6 +2,9 @@ import Data.Map as M
 import Control.Monad.Reader
 import Control.Monad.State
 
+import Common
+import Expressions
+
 data Program =
    Prog [TypeDeclaration] [Decl] [FunctionDeclaration] Block
   deriving (Eq,Ord,Show)
@@ -29,27 +32,6 @@ data Block =
 
 data RBlock =
     SRBlock [Decl] [Stmt] Expression
-    deriving (Eq,Ord,Show)
-
-data Expression =
-    Exp Exp
-    deriving (Eq,Ord,Show)
-
-data Exp =
-      EInt Int
-    | Eor  Exp Exp
-    | Eand Exp Exp
-    | Eeq  Exp Exp
-    | Elt  Exp Exp
-    | Egt  Exp Exp
-    | EAdd Exp Exp
-    | ESub Exp Exp
-    | EMul Exp Exp
-    | EDiv Exp Exp
-    | EMinus Exp
-    | EVar Identifier
-    | Etrue
-    | Efalse
     deriving (Eq,Ord,Show)
 
 data Stmt = SSkip
@@ -81,17 +63,6 @@ data Assignment =
     | AIncDec Identifier IncDec
     deriving (Eq,Ord,Show)
 
-data Type =
-      TInt
-    | TBool
-    deriving (Eq,Ord,Show)
-
-newtype Ident = Ident String
-    deriving (Eq,Ord,Show)
-
-data Identifier = Id Ident
-    deriving (Eq,Ord,Show)
-
 data ArAssign =
    AAPlus
  | AAMinus
@@ -103,98 +74,6 @@ data IncDec =
    Increment
  | Decrement
   deriving (Eq,Ord,Show)
-
-type Loc = Int
-type Env = M.Map String Loc
-type St  = M.Map Loc Int
-
-emptyEnv :: Env
-emptyEnv = M.empty
-
-initialSt :: St
-initialSt = M.singleton 0 1
-
-type Semantics a = ReaderT Env (State St) a
-
-evalId :: Identifier -> String
-evalId (Id id) = evalIdent id
-
-evalIdent :: Ident -> String
-evalIdent (Ident str) = str
-
-takeLocation :: Identifier -> Semantics Loc
-takeLocation id = do
-  Just loc <- asks (M.lookup (evalId id))
-  return loc
-
-takeValue :: Loc -> Semantics Int
-takeValue loc = do
-  Just val <- gets (M.lookup loc)
-  return val
-
-evalE :: Expression -> Semantics Int
-evalE (Exp exp) = do
-    eval exp
-
-eval :: Exp -> Semantics Int
-eval (EInt i) = return i
-eval (EVar id) = do
-    Just loc <- asks (M.lookup (evalId id))
-    Just val <- gets (M.lookup loc)
-    return val
-eval (Eor  exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    if (or [val1 /= 0, val2 /= 0])
-        then return 1
-        else return 0
-eval (Eand  exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    if (and [val1 /= 0, val2 /= 0])
-        then return 1
-        else return 0
-eval (Eeq  exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    if (val1 == val2)
-        then return 1
-        else return 0
-eval (Egt  exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    if (val1 > val2)
-        then return 1
-        else return 0
-eval (Elt  exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    if (val1 < val2)
-        then return 1
-        else return 0
-eval (EAdd exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    return (val1 + val2)
-eval (ESub exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    return (val1 - val2)
-eval (EMul exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    return (val1 * val2)
-eval (EDiv exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    return (div val1 val2)
---eval (EMinus Etrue)  = return 0
---eval (EMinus Efalse) = return 1
-eval (EMinus exp) = do
-    val <- eval exp
-    return (-val)
-eval (Etrue)  = return 1
-eval (Efalse) = return 0
 
 evalDecl :: Decl -> Semantics Env
 evalDecl (DAssign t id expr) = do
