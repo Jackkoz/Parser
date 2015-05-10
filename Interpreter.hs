@@ -37,6 +37,8 @@ data Expression =
 
 data Exp =
       EInt Int
+    | Eor  Exp Exp
+    | Eand Exp Exp
     | Eeq  Exp Exp
     | Elt  Exp Exp
     | Egt  Exp Exp
@@ -144,6 +146,18 @@ eval (EVar id) = do
     Just loc <- asks (M.lookup (evalId id))
     Just val <- gets (M.lookup loc)
     return val
+eval (Eor  exp1 exp2) = do
+    val1 <- eval exp1
+    val2 <- eval exp2
+    if (or [val1 /= 0, val2 /= 0])
+        then return 1
+        else return 0
+eval (Eand  exp1 exp2) = do
+    val1 <- eval exp1
+    val2 <- eval exp2
+    if (and [val1 /= 0, val2 /= 0])
+        then return 1
+        else return 0
 eval (Eeq  exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
