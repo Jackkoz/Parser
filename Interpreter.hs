@@ -72,7 +72,6 @@ data EIf =
 data Decl =
       Declr   Type Identifier
     | DAssign    Type Identifier Expression
---    | SDec
     -- | DConstDec Type Identifier Exp
     deriving (Eq,Ord,Show)
 
@@ -105,20 +104,17 @@ data IncDec =
  | Decrement
   deriving (Eq,Ord,Show)
 
-type Loc = Int -- lokacja
-type Env = M.Map String Loc -- środowisko
-type St  = M.Map Loc Int  -- stan
+type Loc = Int
+type Env = M.Map String Loc
+type St  = M.Map Loc Int
 
 emptyEnv :: Env
 emptyEnv = M.empty
 
--- na pozycji 0 zapisany jest numer następnej wolnej lokacji
 initialSt :: St
 initialSt = M.singleton 0 1
 
 type Semantics a = ReaderT Env (State St) a
--- albo StateT St (Reader Env) a
--- albo Monada = ReaderT Env (StateT St Identity)
 
 evalId :: Identifier -> String
 evalId (Id id) = evalIdent id
@@ -200,12 +196,6 @@ eval (EMinus exp) = do
 eval (Etrue)  = return 1
 eval (Efalse) = return 0
 
---evalExp :: Exp -> Int
---evalExp expr =
---    let readerStuff = eval expr in
---    let stateStuff = runReaderT readerStuff emptyEnv in
---    evalState stateStuff initialSt
-
 evalDecl :: Decl -> Semantics Env
 evalDecl (DAssign t id expr) = do
     Just newLoc <- gets (M.lookup 0)
@@ -222,9 +212,6 @@ evalDecl (Declr t id) = do
     env <- ask
     return $ M.insert (evalId(id)) newLoc env
 
--- można też asks M.insert var newLoc
-
--- Dodatkowa zabawa, aby druga deklaracja z listy mogla juz uzywac pierwszej zmiennej
 evalDecls :: [Decl] -> Semantics Env
 evalDecls [] = ask
 evalDecls (decl:decls) = do
