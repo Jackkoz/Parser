@@ -32,6 +32,7 @@ SExp.       Stmt      ::=     Expression ";"   ;
 SWhile.     Stmt      ::=     "while" "(" Exp ")" Block ;
 SFor.       Stmt      ::=     "from" Exp "to" Exp "as" Ident "do" Block;
 SGuard.     Stmt      ::=     "guard" "(" [Identifier] ")" "in" Block ;
+Sprint.	    Stmt      ::=     "print" "(" Exp ")" ";" ;
 SIf.        Stmt      ::=     If ;
 SIfE.       Stmt      ::=     If "else" Block ;
 
@@ -43,6 +44,7 @@ SEIf.       EIf     ::=     "else if (" Exp ")" Block  ;
 terminator EIf "" ;
 
 Exp.        Expression  ::=     Exp  ;
+ExpTer.	    Expression  ::=     Exp "?" Exp ":" Exp ;
 
 Eor.     Exp  ::= Exp "||" Exp1 ;
 Eand.    Exp  ::= Exp "&&" Exp1 ;

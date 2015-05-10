@@ -45,6 +45,7 @@ data Stmt =
  | SWhile Exp Block
  | SFor Exp Exp Ident Block
  | SGuard [Identifier] Block
+ | Sprint Exp
  | SIf If
  | SIfE If Block
   deriving (Eq,Ord,Show)
@@ -59,6 +60,7 @@ data EIf =
 
 data Expression =
    Exp Exp
+ | ExpTer Exp Exp Exp
   deriving (Eq,Ord,Show)
 
 data Exp =

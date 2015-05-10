@@ -150,6 +150,7 @@ instance Print Stmt where
    SWhile exp block -> prPrec i 0 (concatD [doc (showString "while") , doc (showString "(") , prt 0 exp , doc (showString ")") , prt 0 block])
    SFor exp0 exp id block -> prPrec i 0 (concatD [doc (showString "from") , prt 0 exp0 , doc (showString "to") , prt 0 exp , doc (showString "as") , prt 0 id , doc (showString "do") , prt 0 block])
    SGuard identifiers block -> prPrec i 0 (concatD [doc (showString "guard") , doc (showString "(") , prt 0 identifiers , doc (showString ")") , doc (showString "in") , prt 0 block])
+   Sprint exp -> prPrec i 0 (concatD [doc (showString "print") , doc (showString "(") , prt 0 exp , doc (showString ")") , doc (showString ";")])
    SIf if' -> prPrec i 0 (concatD [prt 0 if'])
    SIfE if' block -> prPrec i 0 (concatD [prt 0 if' , doc (showString "else") , prt 0 block])
 
@@ -173,6 +174,7 @@ instance Print EIf where
 instance Print Expression where
   prt i e = case e of
    Exp exp -> prPrec i 0 (concatD [prt 0 exp])
+   ExpTer exp0 exp1 exp -> prPrec i 0 (concatD [prt 0 exp0 , doc (showString "?") , prt 0 exp1 , doc (showString ":") , prt 0 exp])
 
 
 instance Print Exp where

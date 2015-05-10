@@ -44,9 +44,9 @@ The reserved words used in Gram are the following: \\
 {\reserved{do}} &{\reserved{else}} &{\reserved{false}} \\
 {\reserved{from}} &{\reserved{function}} &{\reserved{guard}} \\
 {\reserved{in}} &{\reserved{int}} &{\reserved{is}} \\
-{\reserved{main}} &{\reserved{return}} &{\reserved{to}} \\
-{\reserved{true}} &{\reserved{type}} &{\reserved{void}} \\
-{\reserved{while}} & & \\
+{\reserved{main}} &{\reserved{print}} &{\reserved{return}} \\
+{\reserved{to}} &{\reserved{true}} &{\reserved{type}} \\
+{\reserved{void}} &{\reserved{while}} & \\
 \end{tabular}\\
 
 The symbols used in Gram are the following: \\
@@ -55,12 +55,12 @@ The symbols used in Gram are the following: \\
 {\symb{\{}} &{\symb{\}}} &{\symb{;}} \\
 {\symb{{$=$}}} &{\symb{(}} &{\symb{)}} \\
 {\symb{:}} &{\symb{,}} &{\symb{if (}} \\
-{\symb{else if (}} &{\symb{{$|$}{$|$}}} &{\symb{\&\&}} \\
-{\symb{{$=$}{$=$}}} &{\symb{{$<$}}} &{\symb{{$>$}}} \\
-{\symb{{$+$}}} &{\symb{{$-$}}} &{\symb{*}} \\
-{\symb{/}} &{\symb{{$+$}{$=$}}} &{\symb{{$-$}{$=$}}} \\
-{\symb{*{$=$}}} &{\symb{/{$=$}}} &{\symb{{$+$}{$+$}}} \\
-{\symb{{$-$}{$-$}}} & & \\
+{\symb{else if (}} &{\symb{?}} &{\symb{{$|$}{$|$}}} \\
+{\symb{\&\&}} &{\symb{{$=$}{$=$}}} &{\symb{{$<$}}} \\
+{\symb{{$>$}}} &{\symb{{$+$}}} &{\symb{{$-$}}} \\
+{\symb{*}} &{\symb{/}} &{\symb{{$+$}{$=$}}} \\
+{\symb{{$-$}{$=$}}} &{\symb{*{$=$}}} &{\symb{/{$=$}}} \\
+{\symb{{$+$}{$+$}}} &{\symb{{$-$}{$-$}}} & \\
 \end{tabular}\\
 
 \subsection*{Comments}
@@ -140,6 +140,7 @@ All other symbols are terminals.\\
  & {\delimit}  &{\terminal{while}} {\terminal{(}} {\nonterminal{Exp}} {\terminal{)}} {\nonterminal{Block}}  \\
  & {\delimit}  &{\terminal{from}} {\nonterminal{Exp}} {\terminal{to}} {\nonterminal{Exp}} {\terminal{as}} {\nonterminal{Ident}} {\terminal{do}} {\nonterminal{Block}}  \\
  & {\delimit}  &{\terminal{guard}} {\terminal{(}} {\nonterminal{ListIdentifier}} {\terminal{)}} {\terminal{in}} {\nonterminal{Block}}  \\
+ & {\delimit}  &{\terminal{print}} {\terminal{(}} {\nonterminal{Exp}} {\terminal{)}} {\terminal{;}}  \\
  & {\delimit}  &{\nonterminal{If}}  \\
  & {\delimit}  &{\nonterminal{If}} {\terminal{else}} {\nonterminal{Block}}  \\
 \end{tabular}\\
@@ -164,6 +165,7 @@ All other symbols are terminals.\\
 
 \begin{tabular}{lll}
 {\nonterminal{Expression}} & {\arrow}  &{\nonterminal{Exp}}  \\
+ & {\delimit}  &{\nonterminal{Exp}} {\terminal{?}} {\nonterminal{Exp}} {\terminal{:}} {\nonterminal{Exp}}  \\
 \end{tabular}\\
 
 \begin{tabular}{lll}
