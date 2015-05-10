@@ -22,4 +22,9 @@ main {
 
     y = y == 0 ? 1 : -1;
     print(y);
+
+    print(y / 2);
+    y = 10;
+    y /= 2;
+    print(y);
 }
