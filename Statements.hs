@@ -35,6 +35,10 @@ interpret this@(SWhile exp block) = do
             interpretB block
             interpret this
 
+interpret (Sprint Etrue) = do
+    liftIO $ print "true"
+interpret (Sprint Efalse) = do
+    liftIO $ print "false"
 interpret (Sprint exp) = do
     val <- eval exp
     liftIO $ print val
