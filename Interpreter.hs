@@ -5,16 +5,12 @@ import Control.Monad.Reader
 import Control.Monad.State
 
 import Types
+import AbsGram
 import Statements
 import Expressions
 import Declarations
 import Assignements
 
-import AbsGram
-
-data Program =
-   Prog [TypeDeclaration] [Decl] [FunctionDeclaration] Block
-  deriving (Eq,Ord,Show)
 
 interpretP :: Program -> Semantics ()
 interpretP (Prog typeD decls funD b) = do

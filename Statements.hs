@@ -5,12 +5,12 @@ import Control.Monad.Reader
 import Control.Monad.State
 
 import Types
+import AbsGram
 import Expressions
 import Declarations
 import Assignements
 
 interpret :: Stmt -> Semantics ()
-interpret SSkip = return ()
 
 interpret (SAssign a) = do
     interpretA a

@@ -5,6 +5,7 @@ import Control.Monad.Reader
 import Control.Monad.State
 
 import Types
+import AbsGram
 import Expressions
 
 evalDecl :: Decl -> Semantics Env
