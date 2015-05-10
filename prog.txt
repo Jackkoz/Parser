@@ -1,0 +1,19 @@
+main {
+	int x = 5;
+	x++;
+	if (x > 3) 
+	{
+		#int x = 1;
+		x -= 3;
+	}
+	if (x > 2 && x < 4) 
+		{x += 1;}
+	else 
+	{
+		bool y = false;	
+	}
+	while (x < 10 || x < 9)
+	{
+		x++;
+	}
+}
