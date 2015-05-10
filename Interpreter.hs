@@ -51,7 +51,7 @@ data Stmt = SSkip
     | SAssign Assignment
     | SIf If
     | SIfE If Block
-    | SWhile Expression Block
+    | SWhile Exp Block
 --    | SExp Exp
 --    | SBlock [Decl] [Stmt]
     deriving (Eq,Ord,Show)
@@ -265,7 +265,7 @@ interpret (SIfE (If exp b eifs) belse) = do
         else interpretB b
 
 interpret this@(SWhile exp block) = do
-    bval <- evalE exp
+    bval <- eval exp
     if bval == 0
         then return ()
         else do
