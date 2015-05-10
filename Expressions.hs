@@ -5,6 +5,7 @@ import Control.Monad.Reader
 import Control.Monad.State
 
 import Types
+import AbsGram
 
 evalE :: Expression -> Semantics Int
 evalE (Exp exp) = do

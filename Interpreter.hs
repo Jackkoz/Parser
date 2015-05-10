@@ -1,3 +1,5 @@
+module Interpreter where
+
 import Data.Map as M
 import Control.Monad.Reader
 import Control.Monad.State
@@ -7,6 +9,8 @@ import Statements
 import Expressions
 import Declarations
 import Assignements
+
+import AbsGram
 
 data Program =
    Prog [TypeDeclaration] [Decl] [FunctionDeclaration] Block
