@@ -1,0 +1,9 @@
+main
+{
+    int x = 5;
+    x++;
+    x--;
+    # x++ jest przypisaniem, zaœ po prawej stronie przypisania += oczekujemy
+    # wyra¿enia, st¹d b³¹d kompilacji
+    x += x++;
+}

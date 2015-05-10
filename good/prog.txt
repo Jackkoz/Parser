@@ -1,15 +1,23 @@
 main {
+    # Deklaracja zmiennej x z wartoœci¹ 5
     int x = 5;
+    # Deklaracja zmiennej y z domyœln¹ wartoœci¹ 0
     int y;
 
+    # Zwiêkszenie x o 1, powinno wypisaæ siê 6
     x++;
     print(x);
 
+    # x == 6, zatem oczekujemy "true" na konsoli
     if (x > 3)
     {
         print(true);
     }
+    # Obie poni¿sze linijki wypisa³yby 12, ale nie powinny zajœæ
+    else if (true) {print (x * 2);}
+    else {print (x*2);}
 
+    # x to nadal 6, oczekujemy fa³szu na konsoli
     if (x > 2 && x < 4)
         {x += 1;}
     else
@@ -17,21 +25,26 @@ main {
         print (false);
     }
 
+    # Powinny wypisaæ siê wartoœci od 7 do 10
     while (x < 10 || x < 9)
     {
         x++;
         print(x);
     }
 
-    # print(x);
-
+    # Ternary expression jak w Javie/C++
+    # y == 0 z domyœlnej definicji, wiêc oczekujemy '1' na konosli
     y = y == 0 ? 1 : -1;
     print(y);
 
+    # Dzielenie jest ca³kowitoliczbowe, wiêc powinno wypisaæ siê 0
     print(y / 2);
+
+    # Powinno wypisaæ siê 5
     y = 10;
     y /= 2;
     print(y);
-    # x == 10 y == 5
+
+    # x == 10 y == 5, powinno wypisaæ siê 61
     print (x * (y + 1) + 1);
 }
