@@ -64,6 +64,7 @@ transStmt x = case x of
   SWhile exp block  -> failure x
   SFor exp0 exp id block  -> failure x
   SGuard identifiers block  -> failure x
+  Sprint exp  -> failure x
   SIf if'  -> failure x
   SIfE if' block  -> failure x
 
@@ -81,6 +82,7 @@ transEIf x = case x of
 transExpression :: Expression -> Result
 transExpression x = case x of
   Exp exp  -> failure x
+  ExpTer exp0 exp1 exp  -> failure x
 
 
 transExp :: Exp -> Result

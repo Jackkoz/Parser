@@ -29,17 +29,17 @@ The reserved words used in Gram are the following:
   | ``as`` | ``bool`` | ``const`` | ``do``
   | ``else`` | ``false`` | ``from`` | ``function``
   | ``guard`` | ``in`` | ``int`` | ``is``
-  | ``main`` | ``return`` | ``to`` | ``true``
-  | ``type`` | ``void`` | ``while`` | 
+  | ``main`` | ``print`` | ``return`` | ``to``
+  | ``true`` | ``type`` | ``void`` | ``while``
 
 The symbols used in Gram are the following:
   | { | } | ; | =
   | ( | ) | : | ,
-  | if ( | else if ( | || | &&
-  | == | < | > | +
-  | - | * | / | +=
-  | -= | *= | /= | ++
-  | -- |  |  | 
+  | if ( | else if ( | ? | ||
+  | && | == | < | >
+  | + | - | * | /
+  | += | -= | *= | /=
+  | ++ | -- |  | 
 
 ===Comments===
 Single-line comments begin with #.There are no multiple-line comments in the grammar.
@@ -78,6 +78,7 @@ All other symbols are terminals.
   |  |  **|**  | ``while`` ``(`` //Exp// ``)`` //Block// 
   |  |  **|**  | ``from`` //Exp// ``to`` //Exp// ``as`` //Ident// ``do`` //Block// 
   |  |  **|**  | ``guard`` ``(`` //[Identifier]// ``)`` ``in`` //Block// 
+  |  |  **|**  | ``print`` ``(`` //Exp// ``)`` ``;`` 
   |  |  **|**  | //If// 
   |  |  **|**  | //If// ``else`` //Block// 
   | //[Stmt]// | -> | **eps**
@@ -87,6 +88,7 @@ All other symbols are terminals.
   | //[EIf]// | -> | **eps**
   |  |  **|**  | //EIf// //[EIf]// 
   | //Expression// | -> | //Exp// 
+  |  |  **|**  | //Exp// ``?`` //Exp// ``:`` //Exp// 
   | //Exp// | -> | //Exp// ``||`` //Exp1// 
   |  |  **|**  | //Exp// ``&&`` //Exp1// 
   |  |  **|**  | //Exp1// 

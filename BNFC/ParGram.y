@@ -35,30 +35,32 @@ import ErrM
  '=' { PT _ (TS _ 18) }
  '==' { PT _ (TS _ 19) }
  '>' { PT _ (TS _ 20) }
- 'as' { PT _ (TS _ 21) }
- 'bool' { PT _ (TS _ 22) }
- 'const' { PT _ (TS _ 23) }
- 'do' { PT _ (TS _ 24) }
- 'else' { PT _ (TS _ 25) }
- 'else if (' { PT _ (TS _ 26) }
- 'false' { PT _ (TS _ 27) }
- 'from' { PT _ (TS _ 28) }
- 'function' { PT _ (TS _ 29) }
- 'guard' { PT _ (TS _ 30) }
- 'if (' { PT _ (TS _ 31) }
- 'in' { PT _ (TS _ 32) }
- 'int' { PT _ (TS _ 33) }
- 'is' { PT _ (TS _ 34) }
- 'main' { PT _ (TS _ 35) }
- 'return' { PT _ (TS _ 36) }
- 'to' { PT _ (TS _ 37) }
- 'true' { PT _ (TS _ 38) }
- 'type' { PT _ (TS _ 39) }
- 'void' { PT _ (TS _ 40) }
- 'while' { PT _ (TS _ 41) }
- '{' { PT _ (TS _ 42) }
- '||' { PT _ (TS _ 43) }
- '}' { PT _ (TS _ 44) }
+ '?' { PT _ (TS _ 21) }
+ 'as' { PT _ (TS _ 22) }
+ 'bool' { PT _ (TS _ 23) }
+ 'const' { PT _ (TS _ 24) }
+ 'do' { PT _ (TS _ 25) }
+ 'else' { PT _ (TS _ 26) }
+ 'else if (' { PT _ (TS _ 27) }
+ 'false' { PT _ (TS _ 28) }
+ 'from' { PT _ (TS _ 29) }
+ 'function' { PT _ (TS _ 30) }
+ 'guard' { PT _ (TS _ 31) }
+ 'if (' { PT _ (TS _ 32) }
+ 'in' { PT _ (TS _ 33) }
+ 'int' { PT _ (TS _ 34) }
+ 'is' { PT _ (TS _ 35) }
+ 'main' { PT _ (TS _ 36) }
+ 'print' { PT _ (TS _ 37) }
+ 'return' { PT _ (TS _ 38) }
+ 'to' { PT _ (TS _ 39) }
+ 'true' { PT _ (TS _ 40) }
+ 'type' { PT _ (TS _ 41) }
+ 'void' { PT _ (TS _ 42) }
+ 'while' { PT _ (TS _ 43) }
+ '{' { PT _ (TS _ 44) }
+ '||' { PT _ (TS _ 45) }
+ '}' { PT _ (TS _ 46) }
 
 L_ident  { PT _ (TV $$) }
 L_integ  { PT _ (TI $$) }
@@ -138,6 +140,7 @@ Stmt : Assignment ';' { SAssign $1 }
   | 'while' '(' Exp ')' Block { SWhile $3 $5 }
   | 'from' Exp 'to' Exp 'as' Ident 'do' Block { SFor $2 $4 $6 $8 }
   | 'guard' '(' ListIdentifier ')' 'in' Block { SGuard $3 $6 }
+  | 'print' '(' Exp ')' ';' { Sprint $3 }
   | If { SIf $1 }
   | If 'else' Block { SIfE $1 $3 }
 
@@ -162,6 +165,7 @@ ListEIf : {- empty -} { [] }
 
 Expression :: { Expression }
 Expression : Exp { Exp $1 } 
+  | Exp '?' Exp ':' Exp { ExpTer $1 $3 $5 }
 
 
 Exp :: { Exp }
