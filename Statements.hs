@@ -35,6 +35,10 @@ interpret this@(SWhile exp block) = do
             interpretB block
             interpret this
 
+interpret (Sprint exp) = do
+    val <- eval exp
+    liftIO $ print val
+
 interpretEIfE :: [EIf] -> Block -> Semantics ()
 interpretEIfE [] belse = interpretB belse
 

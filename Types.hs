@@ -114,7 +114,7 @@ emptyEnv = M.empty
 initialSt :: St
 initialSt = M.singleton 0 1
 
-type Semantics a = ReaderT Env (State St) a
+type Semantics a = ReaderT Env (StateT St IO) a
 
 evalId :: Identifier -> String
 evalId (Id id) = evalIdent id
