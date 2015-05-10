@@ -106,7 +106,7 @@ import AbsGram
 
 type Loc = Int
 type Env = M.Map String Loc
-type St  = M.Map Loc Int
+type St  = M.Map Loc Integer
 
 emptyEnv :: Env
 emptyEnv = M.empty
@@ -127,7 +127,7 @@ takeLocation id = do
     Just loc <- asks (M.lookup (evalId id))
     return loc
 
-takeValue :: Loc -> Semantics Int
+takeValue :: Loc -> Semantics Integer
 takeValue loc = do
     Just val <- gets (M.lookup loc)
     return val

@@ -7,11 +7,11 @@ import Control.Monad.State
 import Types
 import AbsGram
 
-evalE :: Expression -> Semantics Int
+evalE :: Expression -> Semantics Integer
 evalE (Exp exp) = do
     eval exp
 
-eval :: Exp -> Semantics Int
+eval :: Exp -> Semantics Integer
 eval (EInt i) = return i
 
 eval (EVar id) = do
