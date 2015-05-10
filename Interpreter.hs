@@ -20,7 +20,7 @@ interpretP (Prog typeD decls funD b) = do
 execProgram :: Program -> IO ()
 execProgram p = do
     finalState <- execStateT (runReaderT (interpretP p) emptyEnv) initialSt
---    print finalState
+    return ()
 
 test1 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EAdd (EVar (Id (Ident "x"))) (EInt 5)))),SAssign (Assign (Id (Ident "y")) (Exp Efalse))])
 
