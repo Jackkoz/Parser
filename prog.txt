@@ -1,24 +1,29 @@
 main {
     int x = 5;
     int y;
+
     x++;
+    print(x);
+
     if (x > 3)
     {
-        #int x = 1;
-        x -= 3;
+        print(true);
     }
+
     if (x > 2 && x < 4)
         {x += 1;}
     else
     {
-        bool y = false;
+        print (false);
     }
+
     while (x < 10 || x < 9)
     {
         x++;
+        print(x);
     }
 
-    print(x);
+    # print(x);
 
     y = y == 0 ? 1 : -1;
     print(y);
@@ -27,4 +32,6 @@ main {
     y = 10;
     y /= 2;
     print(y);
+    # x == 10 y == 5
+    print (x * (y + 1) + 1);
 }
