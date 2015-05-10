@@ -338,3 +338,5 @@ test2 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id 
 test3 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 6))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 7))), SIf (If Etrue (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 8)))]) []) ])
 
 testW = Prog [] [] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 0))]    [SWhile (Elt (EVar (Id (Ident "x"))) (EInt 5)) (SBlock [] [SAssign (AIncDec (Id (Ident "x")) Increment)])])
+
+test4 = Prog [] [] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [SAssign (AIncDec (Id (Ident "x")) Increment),SIf (If Etrue (SBlock [] [SAssign (AIncDec (Id (Ident "x")) Increment)]) [SEIf Etrue (SBlock [] [SAssign (AIncDec (Id (Ident "x")) Increment)])]),SWhile Efalse (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 0)))])])
