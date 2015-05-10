@@ -49,11 +49,20 @@ data Exp =
 
 data Stmt = SSkip
     | SAssign Assignment
-    | SIf Expression Block Block
+    | SIf If
+    | SIfE If Block
     | SWhile Expression Block
 --    | SExp Exp
 --    | SBlock [Decl] [Stmt]
     deriving (Eq,Ord,Show)
+
+data If =
+   If Exp Block [EIf]
+  deriving (Eq,Ord,Show)
+
+data EIf =
+   SEIf Exp Block
+  deriving (Eq,Ord,Show)
      
 data Decl =
       Declr   Type Identifier
@@ -243,11 +252,17 @@ interpret SSkip = return ()
 interpret (SAssign a) = do
     interpretA a
 
-interpret (SIf exp block1 block2) = do
-  bval <- evalE exp
-  if bval == 0
-     then interpretB block2
-     else interpretB block1
+interpret (SIf (If exp b eifs)) = do
+    bval <- eval exp
+    if bval == 0
+        then interpretEIf eifs
+        else interpretB b
+
+interpret (SIfE (If exp b eifs) belse) = do
+    bval <- eval exp
+    if bval == 0
+        then interpretEIfE eifs belse
+        else interpretB b
 
 interpret this@(SWhile exp block) = do
     bval <- evalE exp
@@ -256,6 +271,24 @@ interpret this@(SWhile exp block) = do
         else do
             interpretB block
             interpret this
+
+interpretEIfE :: [EIf] -> Block -> Semantics ()
+interpretEIfE [] belse = interpretB belse
+
+interpretEIfE ((SEIf exp b):eifs) belse = do
+    bval <- eval exp
+    if bval == 0
+        then interpretEIfE eifs belse
+        else interpretB b
+
+interpretEIf :: [EIf] -> Semantics ()
+interpretEIf [] = return ()
+
+interpretEIf ((SEIf exp b):eifs) = do
+    bval <- eval exp
+    if bval == 0
+        then interpretEIf eifs
+        else interpretB b
 
 execProgram :: Program -> IO ()
 execProgram p = do
@@ -267,4 +300,4 @@ test1 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id 
 
 test2 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5)),DAssign TBool (Id (Ident "y")) (Exp Etrue)] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 5)))])
 
-test3 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 6))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 7))), SIf (Exp (EInt 1)) (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 8)))]) (SBlock [] []) ])
+test3 = Prog [] [DAssign TInt (Id (Ident "x")) (Exp (EInt 5))] [] (SBlock [DAssign TInt (Id (Ident "x")) (Exp (EInt 6))] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 7))), SIf (If Etrue (SBlock [] [SAssign (Assign (Id (Ident "x")) (Exp (EInt 8)))]) []) ])
