@@ -104,7 +104,7 @@ import AbsGram
 --data Identifier = Id Ident
 --    deriving (Eq,Ord,Show)
 
-type Loc = Int
+type Loc = Integer
 type Env = M.Map String Loc
 type St  = M.Map Loc Integer
 
