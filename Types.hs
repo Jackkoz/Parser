@@ -26,8 +26,10 @@ evalIdent (Ident str) = str
 
 takeLocation :: Identifier -> Semantics Loc
 takeLocation id = do
-    Just loc <- asks (M.lookup (evalId id))
-    return loc
+    loc <- asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> return loc
+        Nothing  -> error ("Undeclared variable: " ++ (evalId id))
 
 takeValue :: Loc -> Semantics Integer
 takeValue loc = do

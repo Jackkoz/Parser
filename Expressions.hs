@@ -23,9 +23,13 @@ eval :: Exp -> Semantics Integer
 eval (EInt i) = return i
 
 eval (EVar id) = do
-    Just loc <- asks (M.lookup (evalId id))
-    Just val <- gets (M.lookup loc)
-    return val
+    loc <- asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            Just val <- gets (M.lookup loc)
+            return val
+        Nothing  -> error ("Undeclared variable: " ++ (evalId id))
+
 
 eval (Eor  exp1 exp2) = do
     val1 <- eval exp1
