@@ -4,28 +4,7 @@ import Data.Map as M
 import Control.Monad.Reader
 import Control.Monad.State
 
-import Common
-
-data Expression =
-    Exp Exp
-    deriving (Eq,Ord,Show)
-
-data Exp =
-      EInt Int
-    | Eor  Exp Exp
-    | Eand Exp Exp
-    | Eeq  Exp Exp
-    | Elt  Exp Exp
-    | Egt  Exp Exp
-    | EAdd Exp Exp
-    | ESub Exp Exp
-    | EMul Exp Exp
-    | EDiv Exp Exp
-    | EMinus Exp
-    | EVar Identifier
-    | Etrue
-    | Efalse
-    deriving (Eq,Ord,Show)
+import Types
 
 evalE :: Expression -> Semantics Int
 evalE (Exp exp) = do
