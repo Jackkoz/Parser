@@ -75,11 +75,11 @@ Program : ListTypeDeclaration ListDecl ListFunctionDeclaration 'main' Block { Pr
 
 
 Block :: { Block }
-Block : '{' ListSt '}' { SBlock (reverse $2) } 
+Block : '{' ListDecl ListStmt '}' { SBlock (reverse $2) (reverse $3) } 
 
 
 RBlock :: { RBlock }
-RBlock : '{' ListSt 'return' Expression ';' '}' { SRBlock (reverse $2) $4 } 
+RBlock : '{' ListDecl ListStmt 'return' Expression ';' '}' { SRBlock (reverse $2) (reverse $3) $5 } 
 
 
 Decl :: { Decl }
@@ -132,9 +132,8 @@ ListArguments : {- empty -} { [] }
   | Arguments ',' ListArguments { (:) $1 $3 }
 
 
-St :: { St }
-St : Decl ';' { SDec $1 } 
-  | Assignment ';' { SAssign $1 }
+Stmt :: { Stmt }
+Stmt : Assignment ';' { SAssign $1 } 
   | Expression ';' { SExp $1 }
   | 'while' '(' Exp ')' Block { SWhile $3 $5 }
   | 'from' Exp 'to' Exp 'as' Ident 'do' Block { SFor $2 $4 $6 $8 }
@@ -143,9 +142,9 @@ St : Decl ';' { SDec $1 }
   | If 'else' Block { SIfE $1 $3 }
 
 
-ListSt :: { [St] }
-ListSt : {- empty -} { [] } 
-  | ListSt St { flip (:) $1 $2 }
+ListStmt :: { [Stmt] }
+ListStmt : {- empty -} { [] } 
+  | ListStmt Stmt { flip (:) $1 $2 }
 
 
 If :: { If }

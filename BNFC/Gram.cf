@@ -2,8 +2,8 @@ entrypoints Program ;
 
 Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
 
-SBlock.		Block 		::=     "{" [St] "}" ;
-SRBlock. 	RBlock 		::=     "{" [St] "return" Expression ";" "}" ;
+SBlock.		Block 		::=     "{" [Decl] [Stmt] "}" ;
+SRBlock. 	RBlock 		::=     "{" [Decl] [Stmt] "return" Expression ";" "}" ;
 
 Declr.          Decl    ::=     Type Identifier ;
 DAssign.        Decl    ::=     Type Identifier "=" Expression ;
@@ -26,16 +26,16 @@ Args.       Arguments           ::=     Type Identifier ;
 separator   CallArgs    "," ;
 separator   Arguments   "," ;
 
-SDec.       St      ::=     Decl ";" ;
-SAssign.    St      ::=     Assignment ";"   ;
-SExp.       St      ::=     Expression ";"   ;
-SWhile.     St      ::=     "while" "(" Exp ")" Block ;
-SFor.       St      ::=     "from" Exp "to" Exp "as" Ident "do" Block;
-SGuard.     St      ::=     "guard" "(" [Identifier] ")" "in" Block ;
-SIf.        St      ::=     If ;
-SIfE.       St      ::=     If "else" Block ;
+--SDec.       St      ::=     Decl ";" ;
+SAssign.    Stmt      ::=     Assignment ";"   ;
+SExp.       Stmt      ::=     Expression ";"   ;
+SWhile.     Stmt      ::=     "while" "(" Exp ")" Block ;
+SFor.       Stmt      ::=     "from" Exp "to" Exp "as" Ident "do" Block;
+SGuard.     Stmt      ::=     "guard" "(" [Identifier] ")" "in" Block ;
+SIf.        Stmt      ::=     If ;
+SIfE.       Stmt      ::=     If "else" Block ;
 
-terminator St "" ;
+terminator Stmt "" ;
 
 If.         If      ::=     "if (" Exp ")" Block [EIf] ;
 SEIf.       EIf     ::=     "else if (" Exp ")" Block  ;

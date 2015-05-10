@@ -77,11 +77,11 @@ All other symbols are terminals.\\
 \end{tabular}\\
 
 \begin{tabular}{lll}
-{\nonterminal{Block}} & {\arrow}  &{\terminal{\{}} {\nonterminal{ListSt}} {\terminal{\}}}  \\
+{\nonterminal{Block}} & {\arrow}  &{\terminal{\{}} {\nonterminal{ListDecl}} {\nonterminal{ListStmt}} {\terminal{\}}}  \\
 \end{tabular}\\
 
 \begin{tabular}{lll}
-{\nonterminal{RBlock}} & {\arrow}  &{\terminal{\{}} {\nonterminal{ListSt}} {\terminal{return}} {\nonterminal{Expression}} {\terminal{;}} {\terminal{\}}}  \\
+{\nonterminal{RBlock}} & {\arrow}  &{\terminal{\{}} {\nonterminal{ListDecl}} {\nonterminal{ListStmt}} {\terminal{return}} {\nonterminal{Expression}} {\terminal{;}} {\terminal{\}}}  \\
 \end{tabular}\\
 
 \begin{tabular}{lll}
@@ -135,8 +135,7 @@ All other symbols are terminals.\\
 \end{tabular}\\
 
 \begin{tabular}{lll}
-{\nonterminal{St}} & {\arrow}  &{\nonterminal{Decl}} {\terminal{;}}  \\
- & {\delimit}  &{\nonterminal{Assignment}} {\terminal{;}}  \\
+{\nonterminal{Stmt}} & {\arrow}  &{\nonterminal{Assignment}} {\terminal{;}}  \\
  & {\delimit}  &{\nonterminal{Expression}} {\terminal{;}}  \\
  & {\delimit}  &{\terminal{while}} {\terminal{(}} {\nonterminal{Exp}} {\terminal{)}} {\nonterminal{Block}}  \\
  & {\delimit}  &{\terminal{from}} {\nonterminal{Exp}} {\terminal{to}} {\nonterminal{Exp}} {\terminal{as}} {\nonterminal{Ident}} {\terminal{do}} {\nonterminal{Block}}  \\
@@ -146,8 +145,8 @@ All other symbols are terminals.\\
 \end{tabular}\\
 
 \begin{tabular}{lll}
-{\nonterminal{ListSt}} & {\arrow}  &{\emptyP} \\
- & {\delimit}  &{\nonterminal{St}} {\nonterminal{ListSt}}  \\
+{\nonterminal{ListStmt}} & {\arrow}  &{\emptyP} \\
+ & {\delimit}  &{\nonterminal{Stmt}} {\nonterminal{ListStmt}}  \\
 \end{tabular}\\
 
 \begin{tabular}{lll}

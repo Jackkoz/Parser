@@ -90,12 +90,12 @@ instance Print Program where
 
 instance Print Block where
   prt i e = case e of
-   SBlock sts -> prPrec i 0 (concatD [doc (showString "{") , prt 0 sts , doc (showString "}")])
+   SBlock decls stmts -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 stmts , doc (showString "}")])
 
 
 instance Print RBlock where
   prt i e = case e of
-   SRBlock sts expression -> prPrec i 0 (concatD [doc (showString "{") , prt 0 sts , doc (showString "return") , prt 0 expression , doc (showString ";") , doc (showString "}")])
+   SRBlock decls stmts expression -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 stmts , doc (showString "return") , prt 0 expression , doc (showString ";") , doc (showString "}")])
 
 
 instance Print Decl where
@@ -143,9 +143,8 @@ instance Print Arguments where
    [x] -> (concatD [prt 0 x])
    x:xs -> (concatD [prt 0 x , doc (showString ",") , prt 0 xs])
 
-instance Print St where
+instance Print Stmt where
   prt i e = case e of
-   SDec decl -> prPrec i 0 (concatD [prt 0 decl , doc (showString ";")])
    SAssign assignment -> prPrec i 0 (concatD [prt 0 assignment , doc (showString ";")])
    SExp expression -> prPrec i 0 (concatD [prt 0 expression , doc (showString ";")])
    SWhile exp block -> prPrec i 0 (concatD [doc (showString "while") , doc (showString "(") , prt 0 exp , doc (showString ")") , prt 0 block])

@@ -51,8 +51,8 @@ and **eps** (empty rule) belong to the BNF notation.
 All other symbols are terminals.
 
   | //Program// | -> | //[TypeDeclaration]// //[Decl]// //[FunctionDeclaration]// ``main`` //Block// 
-  | //Block// | -> | ``{`` //[St]// ``}`` 
-  | //RBlock// | -> | ``{`` //[St]// ``return`` //Expression// ``;`` ``}`` 
+  | //Block// | -> | ``{`` //[Decl]// //[Stmt]// ``}`` 
+  | //RBlock// | -> | ``{`` //[Decl]// //[Stmt]// ``return`` //Expression// ``;`` ``}`` 
   | //Decl// | -> | //Type// //Identifier// 
   |  |  **|**  | //Type// //Identifier// ``=`` //Expression// 
   |  |  **|**  | ``const`` //Type// //Identifier// ``=`` //Expression// 
@@ -73,16 +73,15 @@ All other symbols are terminals.
   | //[Arguments]// | -> | **eps**
   |  |  **|**  | //Arguments// 
   |  |  **|**  | //Arguments// ``,`` //[Arguments]// 
-  | //St// | -> | //Decl// ``;`` 
-  |  |  **|**  | //Assignment// ``;`` 
+  | //Stmt// | -> | //Assignment// ``;`` 
   |  |  **|**  | //Expression// ``;`` 
   |  |  **|**  | ``while`` ``(`` //Exp// ``)`` //Block// 
   |  |  **|**  | ``from`` //Exp// ``to`` //Exp// ``as`` //Ident// ``do`` //Block// 
   |  |  **|**  | ``guard`` ``(`` //[Identifier]// ``)`` ``in`` //Block// 
   |  |  **|**  | //If// 
   |  |  **|**  | //If// ``else`` //Block// 
-  | //[St]// | -> | **eps**
-  |  |  **|**  | //St// //[St]// 
+  | //[Stmt]// | -> | **eps**
+  |  |  **|**  | //Stmt// //[Stmt]// 
   | //If// | -> | ``if (`` //Exp// ``)`` //Block// //[EIf]// 
   | //EIf// | -> | ``else if (`` //Exp// ``)`` //Block// 
   | //[EIf]// | -> | **eps**

@@ -21,12 +21,12 @@ transProgram x = case x of
 
 transBlock :: Block -> Result
 transBlock x = case x of
-  SBlock sts  -> failure x
+  SBlock decls stmts  -> failure x
 
 
 transRBlock :: RBlock -> Result
 transRBlock x = case x of
-  SRBlock sts expression  -> failure x
+  SRBlock decls stmts expression  -> failure x
 
 
 transDecl :: Decl -> Result
@@ -57,9 +57,8 @@ transArguments x = case x of
   Args type' identifier  -> failure x
 
 
-transSt :: St -> Result
-transSt x = case x of
-  SDec decl  -> failure x
+transStmt :: Stmt -> Result
+transStmt x = case x of
   SAssign assignment  -> failure x
   SExp expression  -> failure x
   SWhile exp block  -> failure x
