@@ -36,7 +36,7 @@ interpretA (AArith id AADiv exp) = do
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     Just val2 <- gets (M.lookup loc)
-    modify (M.insert loc (div val1  val2))
+    modify (M.insert loc (div val2  val1))
 
 interpretA (AIncDec id Increment) = do
     Just loc <-asks (M.lookup (evalId id))
