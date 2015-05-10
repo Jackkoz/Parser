@@ -11,6 +11,14 @@ evalE :: Expression -> Semantics Integer
 evalE (Exp exp) = do
     eval exp
 
+evalE (ExpTer bexp exp1 exp2) = do
+    bvalue <- eval bexp
+    val1 <- eval exp1
+    val2 <- eval exp2
+    if (bvalue == 0)
+        then return val2
+        else return val1
+
 eval :: Exp -> Semantics Integer
 eval (EInt i) = return i
 
