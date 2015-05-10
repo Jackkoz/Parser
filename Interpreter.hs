@@ -156,11 +156,11 @@ eval (EMinus exp) = do
 eval (Etrue)  = return 1
 eval (Efalse) = return 0
 
-evalExp :: Exp -> Int
-evalExp expr =
-    let readerStuff = eval expr in
-    let stateStuff = runReaderT readerStuff emptyEnv in
-    evalState stateStuff initialSt
+--evalExp :: Exp -> Int
+--evalExp expr =
+--    let readerStuff = eval expr in
+--    let stateStuff = runReaderT readerStuff emptyEnv in
+--    evalState stateStuff initialSt
 
 evalDecl :: Decl -> Semantics Env
 evalDecl (DAssign t id expr) = do
