@@ -3,7 +3,7 @@ main
     int x = 5;
     x++;
     x--;
-    # x++ jest przypisaniem, zaœ po prawej stronie przypisania += oczekujemy
-    # wyra¿enia, st¹d b³¹d kompilacji
+    # x++ jest przypisaniem, za po prawej stronie przypisania += oczekujemy
+    # wyraenia, std bd kompilacji
     x += x++;
 }
