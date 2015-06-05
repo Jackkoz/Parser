@@ -62,15 +62,17 @@ import ErrM
  '||' { PT _ (TS _ 45) }
  '}' { PT _ (TS _ 46) }
 
-L_ident  { PT _ (TV $$) }
+L_quoted { PT _ (TL $$) }
 L_integ  { PT _ (TI $$) }
+L_ident  { PT _ (TV $$) }
 L_err    { _ }
 
 
 %%
 
-Ident   :: { Ident }   : L_ident  { Ident $1 }
+String  :: { String }  : L_quoted {  $1 }
 Integer :: { Integer } : L_integ  { (read ( $1)) :: Integer }
+Ident   :: { Ident }   : L_ident  { Ident $1 }
 
 Program :: { Program }
 Program : ListTypeDeclaration ListDecl ListFunctionDeclaration 'main' Block { Prog (reverse $1) (reverse $2) (reverse $3) $5 } 
@@ -138,9 +140,10 @@ Stmt :: { Stmt }
 Stmt : Assignment ';' { SAssign $1 } 
   | Expression ';' { SExp $1 }
   | 'while' '(' Exp ')' Block { SWhile $3 $5 }
-  | 'from' Exp 'to' Exp 'as' Ident 'do' Block { SFor $2 $4 $6 $8 }
+  | 'from' Exp 'to' Exp 'as' Identifier 'do' Block { SFor $2 $4 $6 $8 }
   | 'guard' '(' ListIdentifier ')' 'in' Block { SGuard $3 $6 }
   | 'print' '(' Exp ')' ';' { Sprint $3 }
+  | 'print' '(' String ')' ';' { SprintS $3 }
   | If { SIf $1 }
   | If 'else' Block { SIfE $1 $3 }
 

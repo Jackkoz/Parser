@@ -43,9 +43,10 @@ data Stmt =
    SAssign Assignment
  | SExp Expression
  | SWhile Exp Block
- | SFor Exp Exp Ident Block
+ | SFor Exp Exp Identifier Block
  | SGuard [Identifier] Block
  | Sprint Exp
+ | SprintS String
  | SIf If
  | SIfE If Block
   deriving (Eq,Ord,Show)

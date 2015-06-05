@@ -62,9 +62,10 @@ transStmt x = case x of
   SAssign assignment  -> failure x
   SExp expression  -> failure x
   SWhile exp block  -> failure x
-  SFor exp0 exp id block  -> failure x
+  SFor exp0 exp identifier block  -> failure x
   SGuard identifiers block  -> failure x
   Sprint exp  -> failure x
+  SprintS str  -> failure x
   SIf if'  -> failure x
   SIfE if' block  -> failure x
 

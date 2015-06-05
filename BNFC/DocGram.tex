@@ -29,6 +29,11 @@ reserved words excluded.
 
 
 \subsection*{Literals}
+String literals \nonterminal{String}\ have the form
+\terminal{"}$x$\terminal{"}, where $x$ is any sequence of any characters
+except \terminal{"}\ unless preceded by \verb6\6.
+
+
 Integer literals \nonterminal{Int}\ are nonempty sequences of digits.
 
 
@@ -138,9 +143,10 @@ All other symbols are terminals.\\
 {\nonterminal{Stmt}} & {\arrow}  &{\nonterminal{Assignment}} {\terminal{;}}  \\
  & {\delimit}  &{\nonterminal{Expression}} {\terminal{;}}  \\
  & {\delimit}  &{\terminal{while}} {\terminal{(}} {\nonterminal{Exp}} {\terminal{)}} {\nonterminal{Block}}  \\
- & {\delimit}  &{\terminal{from}} {\nonterminal{Exp}} {\terminal{to}} {\nonterminal{Exp}} {\terminal{as}} {\nonterminal{Ident}} {\terminal{do}} {\nonterminal{Block}}  \\
+ & {\delimit}  &{\terminal{from}} {\nonterminal{Exp}} {\terminal{to}} {\nonterminal{Exp}} {\terminal{as}} {\nonterminal{Identifier}} {\terminal{do}} {\nonterminal{Block}}  \\
  & {\delimit}  &{\terminal{guard}} {\terminal{(}} {\nonterminal{ListIdentifier}} {\terminal{)}} {\terminal{in}} {\nonterminal{Block}}  \\
  & {\delimit}  &{\terminal{print}} {\terminal{(}} {\nonterminal{Exp}} {\terminal{)}} {\terminal{;}}  \\
+ & {\delimit}  &{\terminal{print}} {\terminal{(}} {\nonterminal{String}} {\terminal{)}} {\terminal{;}}  \\
  & {\delimit}  &{\nonterminal{If}}  \\
  & {\delimit}  &{\nonterminal{If}} {\terminal{else}} {\nonterminal{Block}}  \\
 \end{tabular}\\

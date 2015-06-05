@@ -17,6 +17,11 @@ reserved words excluded.
 
 
 ===Literals===
+String literals //String// have the form
+``"``//x//``"``}, where //x// is any sequence of any characters
+except ``"`` unless preceded by ``\``.
+
+
 Integer literals //Integer// are nonempty sequences of digits.
 
 
@@ -76,9 +81,10 @@ All other symbols are terminals.
   | //Stmt// | -> | //Assignment// ``;`` 
   |  |  **|**  | //Expression// ``;`` 
   |  |  **|**  | ``while`` ``(`` //Exp// ``)`` //Block// 
-  |  |  **|**  | ``from`` //Exp// ``to`` //Exp// ``as`` //Ident// ``do`` //Block// 
+  |  |  **|**  | ``from`` //Exp// ``to`` //Exp// ``as`` //Identifier// ``do`` //Block// 
   |  |  **|**  | ``guard`` ``(`` //[Identifier]// ``)`` ``in`` //Block// 
   |  |  **|**  | ``print`` ``(`` //Exp// ``)`` ``;`` 
+  |  |  **|**  | ``print`` ``(`` //String// ``)`` ``;`` 
   |  |  **|**  | //If// 
   |  |  **|**  | //If// ``else`` //Block// 
   | //[Stmt]// | -> | **eps**

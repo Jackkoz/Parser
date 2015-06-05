@@ -3,3 +3,8 @@
 *.hi
 interpreter
 *.exe
+*.bak
+*.log
+*.dvi
+*.ps
+*.aux
