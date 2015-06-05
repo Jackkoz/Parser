@@ -2,7 +2,6 @@
  - Polskie litery w princie
  - Funkcje
  - Rekurencja
- - For
 
 # Parser
 JIPP 2015 - Parser

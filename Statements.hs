@@ -55,6 +55,27 @@ interpret (SGuard ids block) = do
     makeVar ids = do
         mapM_ redeclareVar ids
 
+interpret (SFor exp1 exp2 id block) = do
+    from <- eval exp1
+    to <- eval exp2
+
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    modify (M.insert newLoc (CVal from))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    env' <- (return $ M.insert (evalId(id)) newLoc env)
+
+    doFor newLoc env' to
+    where
+    doFor loc env to = do
+        Just (CVal val) <- gets (M.lookup loc)
+        if (val <= to) then do
+            local (const env) (interpretB block)
+            modify (M.insert loc (CVal (val + 1)))
+            doFor loc env to
+        else
+            return ()
+
 interpretEIfE :: [EIf] -> Block -> Semantics ()
 interpretEIfE [] belse = interpretB belse
 

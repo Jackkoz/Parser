@@ -7,6 +7,15 @@ main {
     # Deklaracja zmiennej y z domyln wartoci 0
     int y;
 
+    print("*** For ***");
+    from 1 to 5 as loop do
+    {
+        print(loop);
+    }
+    print("Koniec for");
+    # Zmienna loop w tym miejscu nie istnieje
+    # print(loop);
+
     # Test zmiennej globalnej
     print(test);
 
