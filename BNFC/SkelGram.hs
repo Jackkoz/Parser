@@ -16,7 +16,7 @@ transIdent x = case x of
 
 transProgram :: Program -> Result
 transProgram x = case x of
-  Prog typedeclarations decls functiondeclarations block  -> failure x
+  Prog decls functiondeclarations block  -> failure x
 
 
 transBlock :: Block -> Result
@@ -36,20 +36,15 @@ transDecl x = case x of
   DConstDec type' identifier expression  -> failure x
 
 
-transTypeDeclaration :: TypeDeclaration -> Result
-transTypeDeclaration x = case x of
-  TDef identifier type'  -> failure x
-
-
 transFunctionDeclaration :: FunctionDeclaration -> Result
 transFunctionDeclaration x = case x of
   FDec identifier argumentss type' rblock  -> failure x
-  PDec identifier argumentss block  -> failure x
 
 
 transCallArgs :: CallArgs -> Result
 transCallArgs x = case x of
   Cargs expression  -> failure x
+  Ref identifier  -> failure x
 
 
 transArguments :: Arguments -> Result

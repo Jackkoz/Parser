@@ -15,52 +15,50 @@ import ErrM
 %tokentype { Token }
 
 %token 
- '&&' { PT _ (TS _ 1) }
- '(' { PT _ (TS _ 2) }
- ')' { PT _ (TS _ 3) }
- '*' { PT _ (TS _ 4) }
- '*=' { PT _ (TS _ 5) }
- '+' { PT _ (TS _ 6) }
- '++' { PT _ (TS _ 7) }
- '+=' { PT _ (TS _ 8) }
- ',' { PT _ (TS _ 9) }
- '-' { PT _ (TS _ 10) }
- '--' { PT _ (TS _ 11) }
- '-=' { PT _ (TS _ 12) }
- '/' { PT _ (TS _ 13) }
- '/=' { PT _ (TS _ 14) }
- ':' { PT _ (TS _ 15) }
- ';' { PT _ (TS _ 16) }
- '<' { PT _ (TS _ 17) }
- '=' { PT _ (TS _ 18) }
- '==' { PT _ (TS _ 19) }
- '>' { PT _ (TS _ 20) }
- '?' { PT _ (TS _ 21) }
- 'as' { PT _ (TS _ 22) }
- 'bool' { PT _ (TS _ 23) }
- 'const' { PT _ (TS _ 24) }
- 'do' { PT _ (TS _ 25) }
- 'else' { PT _ (TS _ 26) }
- 'else if (' { PT _ (TS _ 27) }
- 'false' { PT _ (TS _ 28) }
- 'from' { PT _ (TS _ 29) }
- 'function' { PT _ (TS _ 30) }
- 'guard' { PT _ (TS _ 31) }
- 'if (' { PT _ (TS _ 32) }
- 'in' { PT _ (TS _ 33) }
- 'int' { PT _ (TS _ 34) }
- 'is' { PT _ (TS _ 35) }
+ '&' { PT _ (TS _ 1) }
+ '&&' { PT _ (TS _ 2) }
+ '(' { PT _ (TS _ 3) }
+ ')' { PT _ (TS _ 4) }
+ '*' { PT _ (TS _ 5) }
+ '*=' { PT _ (TS _ 6) }
+ '+' { PT _ (TS _ 7) }
+ '++' { PT _ (TS _ 8) }
+ '+=' { PT _ (TS _ 9) }
+ ',' { PT _ (TS _ 10) }
+ '-' { PT _ (TS _ 11) }
+ '--' { PT _ (TS _ 12) }
+ '-=' { PT _ (TS _ 13) }
+ '/' { PT _ (TS _ 14) }
+ '/=' { PT _ (TS _ 15) }
+ ':' { PT _ (TS _ 16) }
+ ';' { PT _ (TS _ 17) }
+ '<' { PT _ (TS _ 18) }
+ '=' { PT _ (TS _ 19) }
+ '==' { PT _ (TS _ 20) }
+ '>' { PT _ (TS _ 21) }
+ '?' { PT _ (TS _ 22) }
+ 'as' { PT _ (TS _ 23) }
+ 'bool' { PT _ (TS _ 24) }
+ 'const' { PT _ (TS _ 25) }
+ 'do' { PT _ (TS _ 26) }
+ 'else' { PT _ (TS _ 27) }
+ 'else if (' { PT _ (TS _ 28) }
+ 'false' { PT _ (TS _ 29) }
+ 'from' { PT _ (TS _ 30) }
+ 'function' { PT _ (TS _ 31) }
+ 'guard' { PT _ (TS _ 32) }
+ 'if (' { PT _ (TS _ 33) }
+ 'in' { PT _ (TS _ 34) }
+ 'int' { PT _ (TS _ 35) }
  'main' { PT _ (TS _ 36) }
  'print' { PT _ (TS _ 37) }
  'return' { PT _ (TS _ 38) }
  'to' { PT _ (TS _ 39) }
  'true' { PT _ (TS _ 40) }
- 'type' { PT _ (TS _ 41) }
- 'void' { PT _ (TS _ 42) }
- 'while' { PT _ (TS _ 43) }
- '{' { PT _ (TS _ 44) }
- '||' { PT _ (TS _ 45) }
- '}' { PT _ (TS _ 46) }
+ 'while' { PT _ (TS _ 41) }
+ '{' { PT _ (TS _ 42) }
+ '||' { PT _ (TS _ 43) }
+ '}' { PT _ (TS _ 44) }
 
 L_quoted { PT _ (TL $$) }
 L_integ  { PT _ (TI $$) }
@@ -75,7 +73,7 @@ Integer :: { Integer } : L_integ  { (read ( $1)) :: Integer }
 Ident   :: { Ident }   : L_ident  { Ident $1 }
 
 Program :: { Program }
-Program : ListTypeDeclaration ListDecl ListFunctionDeclaration 'main' Block { Prog (reverse $1) (reverse $2) (reverse $3) $5 } 
+Program : ListDecl ListFunctionDeclaration 'main' Block { Prog (reverse $1) (reverse $2) $4 } 
 
 
 Block :: { Block }
@@ -97,18 +95,8 @@ ListDecl : {- empty -} { [] }
   | ListDecl Decl ';' { flip (:) $1 $2 }
 
 
-TypeDeclaration :: { TypeDeclaration }
-TypeDeclaration : 'type' Identifier 'is' Type ';' { TDef $2 $4 } 
-
-
-ListTypeDeclaration :: { [TypeDeclaration] }
-ListTypeDeclaration : {- empty -} { [] } 
-  | ListTypeDeclaration TypeDeclaration { flip (:) $1 $2 }
-
-
 FunctionDeclaration :: { FunctionDeclaration }
 FunctionDeclaration : 'function' Identifier '(' ListArguments ')' ':' Type RBlock { FDec $2 $4 $7 $8 } 
-  | 'function' Identifier '(' ListArguments ')' ':' 'void' Block { PDec $2 $4 $8 }
 
 
 ListFunctionDeclaration :: { [FunctionDeclaration] }
@@ -118,6 +106,7 @@ ListFunctionDeclaration : {- empty -} { [] }
 
 CallArgs :: { CallArgs }
 CallArgs : Expression { Cargs $1 } 
+  | '&' Identifier { Ref $2 }
 
 
 Arguments :: { Arguments }

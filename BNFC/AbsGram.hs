@@ -5,7 +5,7 @@ module AbsGram where
 
 newtype Ident = Ident String deriving (Eq,Ord,Show)
 data Program =
-   Prog [TypeDeclaration] [Decl] [FunctionDeclaration] Block
+   Prog [Decl] [FunctionDeclaration] Block
   deriving (Eq,Ord,Show)
 
 data Block =
@@ -22,17 +22,13 @@ data Decl =
  | DConstDec Type Identifier Expression
   deriving (Eq,Ord,Show)
 
-data TypeDeclaration =
-   TDef Identifier Type
-  deriving (Eq,Ord,Show)
-
 data FunctionDeclaration =
    FDec Identifier [Arguments] Type RBlock
- | PDec Identifier [Arguments] Block
   deriving (Eq,Ord,Show)
 
 data CallArgs =
    Cargs Expression
+ | Ref Identifier
   deriving (Eq,Ord,Show)
 
 data Arguments =

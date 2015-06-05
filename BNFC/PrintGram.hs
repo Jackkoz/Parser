@@ -85,7 +85,7 @@ instance Print Ident where
 
 instance Print Program where
   prt i e = case e of
-   Prog typedeclarations decls functiondeclarations block -> prPrec i 0 (concatD [prt 0 typedeclarations , prt 0 decls , prt 0 functiondeclarations , doc (showString "main") , prt 0 block])
+   Prog decls functiondeclarations block -> prPrec i 0 (concatD [prt 0 decls , prt 0 functiondeclarations , doc (showString "main") , prt 0 block])
 
 
 instance Print Block where
@@ -108,18 +108,9 @@ instance Print Decl where
    [] -> (concatD [])
    x:xs -> (concatD [prt 0 x , doc (showString ";") , prt 0 xs])
 
-instance Print TypeDeclaration where
-  prt i e = case e of
-   TDef identifier type' -> prPrec i 0 (concatD [doc (showString "type") , prt 0 identifier , doc (showString "is") , prt 0 type' , doc (showString ";")])
-
-  prtList es = case es of
-   [] -> (concatD [])
-   x:xs -> (concatD [prt 0 x , prt 0 xs])
-
 instance Print FunctionDeclaration where
   prt i e = case e of
    FDec identifier argumentss type' rblock -> prPrec i 0 (concatD [doc (showString "function") , prt 0 identifier , doc (showString "(") , prt 0 argumentss , doc (showString ")") , doc (showString ":") , prt 0 type' , prt 0 rblock])
-   PDec identifier argumentss block -> prPrec i 0 (concatD [doc (showString "function") , prt 0 identifier , doc (showString "(") , prt 0 argumentss , doc (showString ")") , doc (showString ":") , doc (showString "void") , prt 0 block])
 
   prtList es = case es of
    [] -> (concatD [])
@@ -128,6 +119,7 @@ instance Print FunctionDeclaration where
 instance Print CallArgs where
   prt i e = case e of
    Cargs expression -> prPrec i 0 (concatD [prt 0 expression])
+   Ref identifier -> prPrec i 0 (concatD [doc (showString "&") , prt 0 identifier])
 
   prtList es = case es of
    [] -> (concatD [])
