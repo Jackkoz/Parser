@@ -1,8 +1,9 @@
 entrypoints Program ;
 
-Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
+--Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
+Prog.       Program     ::=     [Decl] [FunctionDeclaration] "main" Block ;
 
---SBlock.		Block 		::=     "{" [Decl] [Stmt] "}" ;
+SBlock.		Block 		::=     "{" [Decl] [Stmt] "}" ;
 SRBlock. 	RBlock 		::=     "{" [Decl] [Stmt] "return" Expression ";" "}" ;
 
 Declr.          Decl    ::=     Type Identifier ;
