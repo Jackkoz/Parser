@@ -8,7 +8,7 @@ import Types
 import AbsGram
 
 interpretP :: Program -> Semantics ()
-interpretP (Prog typeD decls funD b) = do
+interpretP (Prog decls funD b) = do
     env' <- evalDecls decls
     env'' <- local (const env') (evalFuncDecls funD)
     local (const env'') (interpretB b)
