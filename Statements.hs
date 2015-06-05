@@ -43,6 +43,16 @@ interpret (Sprint exp) = do
     val <- eval exp
     liftIO $ print val
 
+interpret (SGuard ids block) = do
+    makeConst ids
+    interpretB block
+    makeVar ids
+    where
+    makeConst ids = do
+        mapM_ redeclareConst ids
+    makeVar ids = do
+        mapM_ redeclareVar ids
+
 interpretEIfE :: [EIf] -> Block -> Semantics ()
 interpretEIfE [] belse = interpretB belse
 

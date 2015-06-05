@@ -1,5 +1,8 @@
 # TODO
  - Printowanie stringów: wsparcie + gramatyka
+ - Funkcje
+ - Rekurencja
+ - For
 
 # Parser
 JIPP 2015 - Parser

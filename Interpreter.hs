@@ -15,7 +15,7 @@ import Assignements
 interpretP :: Program -> Semantics ()
 interpretP (Prog typeD decls funD b) = do
     env' <- evalDecls decls
-    interpretB b
+    local (const env') (interpretB b)
 
 execProgram :: Program -> IO ()
 execProgram p = do

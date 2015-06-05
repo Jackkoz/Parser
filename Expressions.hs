@@ -27,7 +27,11 @@ eval (EVar id) = do
     case loc of
         Just loc -> do
             Just val <- gets (M.lookup loc)
-            return val
+            case val of
+                IVal val -> do
+                    return val
+                CVal val -> do
+                    return val
         Nothing  -> error ("Undeclared variable: " ++ (evalId id))
 
 

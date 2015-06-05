@@ -10,17 +10,24 @@ import Expressions
 
 evalDecl :: Decl -> Semantics Env
 evalDecl (DAssign t id expr) = do
-    Just newLoc <- gets (M.lookup 0)
+    Just (IVal newLoc) <- gets (M.lookup 0)
     val <- evalE expr
-    modify (M.insert newLoc val)
-    modify (M.insert 0 (newLoc+1))
+    modify (M.insert newLoc (IVal val))
+    modify (M.insert 0 (IVal (newLoc+1)))
     env <- ask
     return $ M.insert (evalId(id)) newLoc env
 evalDecl (Declr t id) = do
-    Just newLoc <- gets (M.lookup 0)
+    Just (IVal newLoc) <- gets (M.lookup 0)
     -- initialize to 0
-    modify (M.insert newLoc 0)
-    modify (M.insert 0 (newLoc+1))
+    modify (M.insert newLoc (IVal 0))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
+evalDecl (DConstDec t id expr) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    val <- evalE expr
+    modify (M.insert newLoc (CVal val))
+    modify (M.insert 0 (IVal (newLoc+1)))
     env <- ask
     return $ M.insert (evalId(id)) newLoc env
 
@@ -29,3 +36,19 @@ evalDecls [] = ask
 evalDecls (decl:decls) = do
   env' <- evalDecl decl
   local (const env') (evalDecls decls)
+
+redeclareConst :: Identifier -> Semantics ()
+redeclareConst id = do
+    Just loc <-asks (M.lookup (evalId id))
+    Just val <- gets (M.lookup loc)
+    case val of
+        IVal val -> do
+            modify (M.insert loc (CVal val))
+        CVal val -> do
+            error ("Incorrect parameter in guard statement, already a constant: " ++ evalId(id))
+
+redeclareVar :: Identifier -> Semantics ()
+redeclareVar id = do
+    Just loc <-asks (M.lookup (evalId id))
+    Just (CVal val) <- gets (M.lookup loc)
+    modify (M.insert loc (IVal val))

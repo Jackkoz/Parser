@@ -6,15 +6,21 @@ import Control.Monad.State
 
 import AbsGram
 
+-- for keeping track of const values
+type CInteger = Integer
+
+data Val = IVal Integer | CVal Integer
+    deriving (Eq, Ord, Show)
+
 type Loc = Integer
 type Env = M.Map String Loc
-type St  = M.Map Loc Integer
+type St  = M.Map Loc Val
 
 emptyEnv :: Env
 emptyEnv = M.empty
 
 initialSt :: St
-initialSt = M.singleton 0 1
+initialSt = M.singleton 0 (IVal 1)
 
 type Semantics a = ReaderT Env (StateT St IO) a
 
@@ -31,7 +37,7 @@ takeLocation id = do
         Just loc -> return loc
         Nothing  -> error ("Undeclared variable: " ++ (evalId id))
 
-takeValue :: Loc -> Semantics Integer
+takeValue :: Loc -> Semantics Val
 takeValue loc = do
     Just val <- gets (M.lookup loc)
     return val

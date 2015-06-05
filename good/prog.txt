@@ -1,8 +1,26 @@
+# Deklaracja zmiennej globalnej
+const int test = 0;
+
 main {
-    # Deklaracja zmiennej x z wartoci 5
+    # Deklaracja zmiennej x z wartością 5
     int x = 5;
     # Deklaracja zmiennej y z domyln wartoci 0
     int y;
+
+    # Test zmiennej globalnej
+    print(test);
+
+    # Nielegalna linijka -> test to stała
+    # test++;
+
+    # Blok guard: x w środku będzie stałą
+    guard (x) in {
+        # Wypisuje 5
+        print(x);
+
+        # Nielegalne nadpisanie wartości
+        # x++;
+    }
 
     # Zwikszenie x o 1, powinno wypisa si 6
     x++;
