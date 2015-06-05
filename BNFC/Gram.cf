@@ -14,7 +14,7 @@ terminator      Decl ";" ;
 
 --TDef.       TypeDeclaration     ::=     "type" Identifier "is" Type ";" ;
 
-terminator  TypeDeclaration "" ;
+--terminator  TypeDeclaration "" ;
 
 FDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" Type  RBlock ;
 --PDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" "void" Block ;
