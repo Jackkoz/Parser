@@ -87,11 +87,3 @@ Increment.      IncDec          ::=     "++" ;
 Decrement.      IncDec          ::=     "--" ;
 
 comment "#" ;
-
-{-
-CompG.          ComparisonOperator      ::=     ">"  ;
-CompL.          ComparisonOperator      ::=     "<"  ;
-CompE.          ComparisonOperator      ::=     "==" ;
-LogA.           LogicalOperator         ::=     "&&" ;
-LogO.           LogicalOperator         ::=     "||" ;
--}
