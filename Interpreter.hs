@@ -122,6 +122,7 @@ eval (Call id vals) = do
         Func env rtype args rblock -> do
             env' <- createEnv env args vals
             local (const env') (evalRetBlock rblock)
+        _ -> error("Identifier does not match a function: " ++ evalId(id))
 
     where
     createEnv env [] [] = return env

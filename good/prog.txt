@@ -1,22 +1,24 @@
 # Deklaracja zmiennej globalnej
 const int test = 0;
 
-function plus (int x, int y) : int
+# Prosta funkcja operująca na dwóch argumentach i przesłoniętym
+# y (z punktu widzenia bloku main)
+function plus (int x, int z) : int
 {
-    int z;
-    z = x + y;
-    return z;
+    int y;
+    y = x + z;
+    return y;
 }
 
 function factorial (int f) : int
 {
-    return f > 1 ? f*factorial(f-1) : 1;
+    return f > 1 ? f * factorial(f - 1) : 1;
 }
 
 main {
     # Deklaracja zmiennej x z wartością 5
     int x = 5;
-    # Deklaracja zmiennej y z domyln wartoci 0
+    # Deklaracja zmiennej y z domyślną wartością 0
     int y;
 
     print("*** Test funkcji ***");
@@ -24,6 +26,9 @@ main {
 
     print("*** Test rekurencji ***");
     print(factorial(5));
+
+    # Wykorzystanie funkcji jako procedury
+    factorial(5);
 
     print("*** For ***");
     from 1 to 5 as loop do
@@ -55,6 +60,7 @@ main {
     print(x);
 
     # x == 6, zatem oczekujemy "true" na konsoli
+    print("*** Test logiki boolowskiej ***");
     if (x > 3)
     {
         print(true);
