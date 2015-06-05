@@ -6,11 +6,6 @@ import Control.Monad.State
 
 import Types
 import AbsGram
---import Statements
---import Expressions
---import Declarations
---import Assignements
-
 
 interpretP :: Program -> Semantics ()
 interpretP (Prog typeD decls funD b) = do
@@ -128,7 +123,6 @@ eval (Call id vals) = do
             env' <- createEnv env args vals
             local (const env') (evalRetBlock rblock)
 
-
     where
     createEnv env [] [] = return env
     createEnv env (arg:args) (Cargs val:vals) = do
@@ -216,26 +210,40 @@ interpretA (AIncDec id Decrement) = do
 
 evalDecl :: Decl -> Semantics Env
 evalDecl (DAssign t id expr) = do
-    Just (IVal newLoc) <- gets (M.lookup 0)
-    val <- evalE expr
-    modify (M.insert newLoc (IVal val))
-    modify (M.insert 0 (IVal (newLoc+1)))
-    env <- ask
-    return $ M.insert (evalId(id)) newLoc env
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Nothing -> do
+            Just (IVal newLoc) <- gets (M.lookup 0)
+            val <- evalE expr
+            modify (M.insert newLoc (IVal val))
+            modify (M.insert 0 (IVal (newLoc+1)))
+            env <- ask
+            return $ M.insert (evalId(id)) newLoc env
+
+        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
 evalDecl (Declr t id) = do
-    Just (IVal newLoc) <- gets (M.lookup 0)
-    -- initialize to 0
-    modify (M.insert newLoc (IVal 0))
-    modify (M.insert 0 (IVal (newLoc+1)))
-    env <- ask
-    return $ M.insert (evalId(id)) newLoc env
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Nothing -> do
+            Just (IVal newLoc) <- gets (M.lookup 0)
+            -- initialize to 0
+            modify (M.insert newLoc (IVal 0))
+            modify (M.insert 0 (IVal (newLoc+1)))
+            env <- ask
+            return $ M.insert (evalId(id)) newLoc env
+        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
 evalDecl (DConstDec t id expr) = do
-    Just (IVal newLoc) <- gets (M.lookup 0)
-    val <- evalE expr
-    modify (M.insert newLoc (CVal val))
-    modify (M.insert 0 (IVal (newLoc+1)))
-    env <- ask
-    return $ M.insert (evalId(id)) newLoc env
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Nothing -> do
+            Just (IVal newLoc) <- gets (M.lookup 0)
+            val <- evalE expr
+            modify (M.insert newLoc (CVal val))
+            modify (M.insert 0 (IVal (newLoc+1)))
+            env <- ask
+            return $ M.insert (evalId(id)) newLoc env
+
+        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
 
 evalDecls :: [Decl] -> Semantics Env
 evalDecls [] = ask
