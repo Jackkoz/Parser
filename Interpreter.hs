@@ -292,6 +292,10 @@ interpret :: Stmt -> Semantics ()
 interpret (SAssign a) = do
     interpretA a
 
+interpret (SExp exp) = do
+    evalE exp
+    return ()
+
 interpret (SIf (If exp b eifs)) = do
     bval <- eval exp
     if bval == 0
