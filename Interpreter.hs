@@ -108,7 +108,11 @@ eval (EMul exp1 exp2) = do
 eval (EDiv exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
-    return (div val1 val2)
+    if (val2 == 0)
+    then
+        error("Próba dzielenia przez 0")
+    else
+        return (div val1 val2)
 
 --eval (EMinus Etrue)  = return 0
 --eval (EMinus Efalse) = return 1
