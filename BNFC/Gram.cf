@@ -30,9 +30,10 @@ separator   Arguments   "," ;
 SAssign.    Stmt      ::=     Assignment ";"   ;
 SExp.       Stmt      ::=     Expression ";"   ;
 SWhile.     Stmt      ::=     "while" "(" Exp ")" Block ;
-SFor.       Stmt      ::=     "from" Exp "to" Exp "as" Ident "do" Block;
+SFor.       Stmt      ::=     "from" Exp "to" Exp "as" Identifier "do" Block;
 SGuard.     Stmt      ::=     "guard" "(" [Identifier] ")" "in" Block ;
 Sprint.	    Stmt      ::=     "print" "(" Exp ")" ";" ;
+SprintS.    Stmt      ::=     "print" "(" String ")" ";" ;
 SIf.        Stmt      ::=     If ;
 SIfE.       Stmt      ::=     If "else" Block ;
 
