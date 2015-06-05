@@ -42,6 +42,8 @@ interpret (Sprint Efalse) = do
 interpret (Sprint exp) = do
     val <- eval exp
     liftIO $ print val
+interpret (SprintS s) = do
+    liftIO $ print s
 
 interpret (SGuard ids block) = do
     makeConst ids

@@ -1,5 +1,5 @@
 # TODO
- - Printowanie stringów: wsparcie + gramatyka
+ - Polskie litery w princie
  - Funkcje
  - Rekurencja
  - For

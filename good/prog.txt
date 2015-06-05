@@ -15,6 +15,7 @@ main {
 
     # Blok guard: x w środku będzie stałą
     guard (x) in {
+        print("Wejscie do bloku guard");
         # Wypisuje 5
         print(x);
 
