@@ -96,6 +96,32 @@ eval (EMinus exp) = do
     val <- eval exp
     return (-val)
 
+eval (Call id vals) = do
+    Just loc <-asks (M.lookup (evalId id))
+    Just f <- gets (M.lookup loc)
+    case f of
+        Func env rtype args rblock -> do
+            env' <- createEnv env args vals
+            local (const env') (evalRetBlock rblock)
+            return 1
+
+
+    where
+    createEnv env [] [] = return env
+    createEnv env (arg:args) (Cargs val:vals) = do
+        case arg of
+            Args ttype id -> do
+                val' <- evalE val
+                Just (IVal newLoc) <- gets (M.lookup 0)
+                modify (M.insert newLoc (IVal val'))
+                modify (M.insert 0 (IVal (newLoc+1)))
+                env' <- (return $ M.insert (evalId(id)) newLoc env)
+                createEnv env' args vals
+
 eval (Etrue)  = return 1
 
 eval (Efalse) = return 0
+
+evalRetBlock (RBlock decls stmts exp) = do
+    interpretB (decls stmts)
+    return evalE exp

@@ -52,3 +52,19 @@ redeclareVar id = do
     Just loc <-asks (M.lookup (evalId id))
     Just (CVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal val))
+
+evalFuncDecl :: FunctionDeclaration -> Semantics Env
+evalFuncDecl (FDec id args rtype rblock) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    env' <- return $ M.insert (evalId(id)) newLoc env
+    modify (M.insert newLoc (Func env' rtype args rblock))
+    return env'
+
+evalFuncDecls :: [FunctionDeclaration] -> Semantics Env
+evalFuncDecls [] = ask
+evalFuncDecls (decl:decls) = do
+  env' <- evalFuncDecl decl
+  local (const env') (evalFuncDecls decls)

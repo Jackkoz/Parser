@@ -1,11 +1,29 @@
 # Deklaracja zmiennej globalnej
 const int test = 0;
 
+function plus (int x, int y) : int
+{
+    int z;
+    z = x + y;
+    return z;
+}
+
+function factorial (int f) : int
+{
+    return f > 1 ? f*factorial(f-1) : 1;
+}
+
 main {
     # Deklaracja zmiennej x z wartością 5
     int x = 5;
     # Deklaracja zmiennej y z domyln wartoci 0
     int y;
+
+    print("*** Test funkcji ***");
+    print(plus(x,y+1));
+
+    print("*** Test rekurencji ***");
+    print(factorial(5));
 
     print("*** For ***");
     from 1 to 5 as loop do

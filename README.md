@@ -1,7 +1,5 @@
 # TODO
  - Polskie litery w princie
- - Funkcje
- - Rekurencja
 
 # Parser
 JIPP 2015 - Parser

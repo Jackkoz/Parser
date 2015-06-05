@@ -9,7 +9,7 @@ import AbsGram
 -- for keeping track of const values
 type CInteger = Integer
 
-data Val = IVal Integer | CVal Integer
+data Val = IVal Integer | CVal Integer | Func Env Type [Arguments] RBlock | Proc Env Block
     deriving (Eq, Ord, Show)
 
 type Loc = Integer
