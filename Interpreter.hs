@@ -20,13 +20,14 @@ execProgram p = do
 
 -- EXPRESSIONS
 
-evalE :: Expression -> Semantics Integer
+evalE :: Expression -> Semantics Val
 evalE (Exp exp) = do
     eval exp
 
 evalE (ExpTer bexp exp1 exp2) = do
     bvalue <- eval bexp
-    if (bvalue == 0)
+    bvalue <- getBool bvalue
+    if (not bvalue)
     then do
         val <- eval exp2
         return val
@@ -34,97 +35,99 @@ evalE (ExpTer bexp exp1 exp2) = do
         val <- eval exp1
         return val
 
-eval :: Exp -> Semantics Integer
-eval (EInt i) = return i
+eval :: Exp -> Semantics Val
+eval (EInt i) = return (IVal i)
 
 eval (EVar id) = do
-    checkIsDeclared(id)
-    checkIsVar(id)
-    loc <- asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            Just val <- gets (M.lookup loc)
-            case val of
-                IVal val -> do
-                    return val
-                CVal val -> do
-                    return val
+    Just loc <- asks (M.lookup (evalId id))
+    Just val <- gets (M.lookup loc)
+    return val
 
-eval (Eor  exp1 exp2) = do
+eval (Eor exp1 exp2) = do
     val1 <- eval exp1
-    if (val1 /= 0)
-    then return 1
+    val1 <- getBool val1
+    if (val1)
+    then return (VBool True)
     else do
         val2 <- eval exp2
-        if (or [val1 /= 0, val2 /= 0])
-            then return 1
-            else return 0
+        val2 <- getBool val2
+        if (val2)
+            then return (VBool True)
+            else return (VBool False)
 
 eval (Eand  exp1 exp2) = do
     val1 <- eval exp1
-    if (val1 /= 0)
+    val1 <- getBool val1
+    if (val1)
     then do
         val2 <- eval exp2
-        if (and [val1 /= 0, val2 /= 0])
-            then return 1
-            else return 0
-    else return 0
+        val2 <- getBool val2
+        if (val2)
+            then return (VBool True)
+            else return (VBool False)
+    else return (VBool False)
 
 
 eval (Eeq  exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
     if (val1 == val2)
-        then return 1
-        else return 0
+        then return (VBool True)
+        else return (VBool False)
 
 eval (Egt  exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
     if (val1 > val2)
-        then return 1
-        else return 0
+        then return (VBool True)
+        else return (VBool False)
 
 eval (Elt  exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
     if (val1 < val2)
-        then return 1
-        else return 0
+        then return (VBool True)
+        else return (VBool False)
 
 eval (EAdd exp1 exp2) = do
-    val1 <- eval exp1
-    val2 <- eval exp2
-    return (val1 + val2)
+    (IVal val1) <- eval exp1
+    (IVal val2) <- eval exp2
+    return (IVal (val1 + val2))
 
 eval (ESub exp1 exp2) = do
     val1 <- eval exp1
+    val1 <- getInt val1
     val2 <- eval exp2
-    return (val1 - val2)
+    val2 <- getInt val2
+    return (IVal (val1 - val2))
 
 eval (EMul exp1 exp2) = do
     val1 <- eval exp1
+    val1 <- getInt val1
     val2 <- eval exp2
-    return (val1 * val2)
+    val2 <- getInt val2
+    return (IVal (val1 * val2))
 
 eval (EDiv exp1 exp2) = do
     val1 <- eval exp1
+    val1 <- getInt val1
     val2 <- eval exp2
+    val2 <- getInt val2
     if (val2 == 0)
     then
         error("Próba dzielenia przez 0")
     else
-        return (div val1 val2)
+        return (IVal (div val1 val2))
 
---eval (EMinus Etrue)  = return 0
---eval (EMinus Efalse) = return 1
 eval (EMinus exp) = do
     val <- eval exp
-    return (-val)
+    case val of
+        IVal val -> return (IVal (-val))
+        CVal val -> return (IVal (-val))
+        VBool val -> return (VBool (not val))
+        CBool val -> return (VBool (not val))
 
 eval (Call id vals) = do
-    checkIsDeclared(id)
-    checkIsFunction(id)
     Just loc <-asks (M.lookup (evalId id))
     Just f <- gets (M.lookup loc)
     case f of
@@ -138,7 +141,7 @@ eval (Call id vals) = do
     createEnv env (Args ttype id:args) (Cargs val:vals) = do
         val' <- evalE val
         Just (IVal newLoc) <- gets (M.lookup 0)
-        modify (M.insert newLoc (IVal val'))
+        modify (M.insert newLoc val')
         modify (M.insert 0 (IVal (newLoc+1)))
         env' <- (return $ M.insert (evalId(id)) newLoc env)
         createEnv env' args vals
@@ -157,12 +160,11 @@ eval (Anon ttype rblock) = do
     env <- ask
     local (const env) (evalRetBlock rblock)
 
-eval (Etrue)  = return 1
+eval (Etrue)  = return (VBool True)
 
-eval (Efalse) = return 0
+eval (Efalse) = return (VBool False)
 
 evalRetBlock (SRBlock decls fdecls stmts exp) = do
---    interpretB (SBlock decls stmts)
     env' <- evalDecls decls
     env'' <- local (const env') (evalFuncDecls fdecls)
     local (const env'') (mapM_ interpret stmts)
@@ -174,61 +176,51 @@ evalRetBlock (SRBlock decls fdecls stmts exp) = do
 
 interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
-    modify (M.insert loc (IVal val))
+    modify (M.insert loc val)
 
 interpretA (AArith id AAPlus exp) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val1 <- evalE exp
+    val1 <- getInt val1
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 + val2)))
 
 interpretA (AArith id AAMinus exp) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val1 <- evalE exp
+    val1 <- getInt val1
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val2 - val1)))
 
 interpretA (AArith id AAMulti exp) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val1 <- evalE exp
+    val1 <- getInt val1
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 * val2)))
 
 interpretA (AArith id AADiv exp) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val1 <- evalE exp
+    val1 <- getInt val1
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (div val2  val1)))
 
 interpretA (AIncDec id Increment) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val + 1)))
 
 interpretA (AIncDec id Decrement) = do
-    checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val - 1)))
@@ -238,41 +230,51 @@ interpretA (AIncDec id Decrement) = do
 -- DECLARATIONS
 
 evalDecl :: Decl -> Semantics Env
-evalDecl (DAssign t id expr) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Nothing -> do
-            Just (IVal newLoc) <- gets (M.lookup 0)
-            val <- evalE expr
-            modify (M.insert newLoc (IVal val))
-            modify (M.insert 0 (IVal (newLoc+1)))
-            env <- ask
-            return $ M.insert (evalId(id)) newLoc env
+evalDecl (DAssign TInt id expr) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    val <- evalE expr
+    val <- getInt val
+    modify (M.insert newLoc (IVal val))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
+evalDecl (DAssign TBool id expr) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    val <- evalE expr
+    val <- getBool val
+    modify (M.insert newLoc (VBool val))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
 
-        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
 evalDecl (Declr t id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Nothing -> do
-            Just (IVal newLoc) <- gets (M.lookup 0)
-            -- initialize to 0
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    -- initialize to 0
+    case t of
+        TInt ->
             modify (M.insert newLoc (IVal 0))
-            modify (M.insert 0 (IVal (newLoc+1)))
-            env <- ask
-            return $ M.insert (evalId(id)) newLoc env
-        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
-evalDecl (DConstDec t id expr) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Nothing -> do
-            Just (IVal newLoc) <- gets (M.lookup 0)
-            val <- evalE expr
-            modify (M.insert newLoc (CVal val))
-            modify (M.insert 0 (IVal (newLoc+1)))
-            env <- ask
-            return $ M.insert (evalId(id)) newLoc env
+        TBool ->
+            modify (M.insert newLoc (VBool False))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
 
-        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
+evalDecl (DConstDec TInt id expr) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    val <- evalE expr
+    val <- getInt val
+    modify (M.insert newLoc (CVal val))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
+evalDecl (DConstDec TBool id expr) = do
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    val <- evalE expr
+    val <- getBool val
+    modify (M.insert newLoc (CBool val))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    env <- ask
+    return $ M.insert (evalId(id)) newLoc env
 
 evalDecls :: [Decl] -> Semantics Env
 evalDecls [] = ask
@@ -332,31 +334,34 @@ interpret (SExp exp) = do
 
 interpret (SIf (If exp b eifs)) = do
     bval <- eval exp
-    if bval == 0
+    bval <- getBool bval
+    if (not bval)
         then interpretEIf eifs
         else interpretB b
 
 interpret (SIfE (If exp b eifs) belse) = do
     bval <- eval exp
-    if bval == 0
+    bval <- getBool bval
+    if (not bval)
         then interpretEIfE eifs belse
         else interpretB b
 
 interpret this@(SWhile exp block) = do
     bval <- eval exp
-    if bval == 0
+    bval <- getBool bval
+    if (not bval)
         then return ()
         else do
             interpretB block
             interpret this
 
-interpret (Sprint Etrue) = do
-    liftIO $ print "true"
-interpret (Sprint Efalse) = do
-    liftIO $ print "false"
 interpret (Sprint exp) = do
     val <- eval exp
-    liftIO $ print val
+    case val of
+        IVal  v -> liftIO $ print v
+        CVal  v -> liftIO $ print v
+        VBool v -> liftIO $ print v
+        CBool v -> liftIO $ print v
 interpret (SprintS s) = do
     liftIO $ print s
 
@@ -372,7 +377,9 @@ interpret (SGuard ids block) = do
 
 interpret (SFor exp1 exp2 id block) = do
     from <- eval exp1
+    from <- getInt from
     to <- eval exp2
+    to <- getInt to
 
     Just (IVal newLoc) <- gets (M.lookup 0)
     modify (M.insert newLoc (CVal from))
@@ -396,7 +403,8 @@ interpretEIfE [] belse = interpretB belse
 
 interpretEIfE ((SEIf exp b):eifs) belse = do
     bval <- eval exp
-    if bval == 0
+    bval <- getBool bval
+    if (not bval)
         then interpretEIfE eifs belse
         else interpretB b
 
@@ -405,7 +413,8 @@ interpretEIf [] = return ()
 
 interpretEIf ((SEIf exp b):eifs) = do
     bval <- eval exp
-    if bval == 0
+    bval <- getBool bval
+    if (not bval)
         then interpretEIf eifs
         else interpretB b
 
@@ -427,10 +436,10 @@ checkIsNotConst (id) = do
             case val of
                 Just (CVal val) -> do
                     error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
-                Just (IVal val) ->
-                    return ()
+                Just (CBool val) ->
+                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
                 _ -> do
-                    error("Nielegalna próba przypisania do funkcji " ++ (evalId id))
+                    return ()
         Nothing -> return ()
 
 checkIsFunction (id) = do
@@ -472,3 +481,13 @@ checkIsDeclared (id) = do
             error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
 
 -- *****
+
+getInt v = do
+    case v of
+        IVal v -> return v
+        CVal v -> return v
+
+getBool v = do
+    case v of
+        VBool v -> return v
+        CBool v -> return v

@@ -7,6 +7,7 @@ import Control.Monad.State
 import AbsGram
 
 data Val = IVal Integer | CVal Integer
+    | VBool Bool | CBool Bool
     | Func Env Type [Arguments] RBlock
 --    | Proc Env [Arguments] Block
     deriving (Eq, Ord, Show)

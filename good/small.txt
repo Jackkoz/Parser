@@ -1,0 +1,82 @@
+# Deklaracja zmiennej globalnej
+const int test = 0;
+
+# Prosta funkcja operuj¹ca na dwóch argumentach i przes³oniêtym
+# y (z punktu widzenia bloku main)
+function plus (int x, int z) : int
+{
+    int y;
+    y = x + z;
+    return y;
+}
+
+function factorial (int f) : int
+{
+    int x;
+    return f > 1 ? f * factorial(f - 1) : 1;
+}
+
+function inc (int x) : int {
+    x++;
+    return x;
+}
+
+function dec (int x) : int {
+    x--;
+    return x;
+}
+
+main
+{
+    # Zakomentowane nie dzia³aj¹
+    int x = 5;
+    #bool y = 5;
+    bool y = false;
+    #bool y;
+    x++;
+    x--;
+    #x = y;
+    inc(x);
+    factorial(&x);
+    #factorial(y);
+    from 1 to 5 as loop do
+    {
+        x++;
+    }
+    print(x);
+    while (x < 15)
+    {
+        x++;
+    }
+    # Blok guard: x w œrodku bêdzie sta³¹
+    guard (x) in {
+        print(x);
+    }
+    print(x);
+    print(factorial(5));
+    factorial(5);
+    x = 5;
+    x = factorial(&x);
+    y = execute bool {print(x); return true;};
+    print("Test");
+
+    if (true) {} else {}
+    if (x > 3)
+    {}
+    else if (true) {print ("Error");}
+    else {print ("Error");}
+
+    # x to nadal 6, oczekujemy faszu na konsoli
+    if (x > 2 && x < 4)
+        {print("Error");}
+    else
+    {
+
+    }
+
+    print(true);
+    print(-(true && false));
+    print(5);
+    print(-5);
+    print(-factorial(5) + 1);
+}

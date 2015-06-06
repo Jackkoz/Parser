@@ -136,4 +136,7 @@ main
 
     # x == 10 y == 5, powinno wypisa si 61
     print (x * (y + 1) + 1);
+
+    print(1 > 2);
+    print(true);
 }
