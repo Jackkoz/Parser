@@ -60,7 +60,7 @@ ESub.    Exp3 ::= Exp3 "-" Exp4 ;
 EMul.    Exp4 ::= Exp4 "*" Exp5 ;
 EDiv.    Exp4 ::= Exp4 "/" Exp5 ;
 EMinus.  Exp5 ::= "-" Exp6 ;
-ECast.   Exp5 ::= Type "(" Exp6 ")" ;
+ECast.   Exp5 ::= "(" Exp6 "as" Type ")" ;
 
 Call.    Exp6 ::= Identifier "(" [CallArgs] ")"  ;
 Anon.    Exp6 ::= "execute" Type RBlock ;
