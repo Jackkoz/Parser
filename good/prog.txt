@@ -46,6 +46,11 @@ main
     int x = 5;
     # Deklaracja zmiennej y z domyślną wartością 0
     int y;
+    # Rzutowanie
+    int cast = (true as int);
+    print(cast);
+    cast = ((true && false) as int);
+    print(cast);
 
     print("*** For ***");
         from 1 to 5 as loop do

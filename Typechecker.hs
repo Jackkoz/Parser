@@ -131,6 +131,11 @@ eval (EMul exp1 exp2) = do
 eval (EDiv exp1 exp2) = do
     eval (EAdd exp1 exp2)
 
+eval (ECast exp ttype) = do
+    case ttype of
+        TInt -> return (IVal 1)
+        TBool -> return (VBool True)
+
 eval (EMinus exp) = do
     val <- eval exp
     return (val)
@@ -178,9 +183,21 @@ eval (Call id vals) = do
             Nothing ->
                 error ("Identyfikator nie jest zadeklarowany: " ++ evalId(idd))
 
-eval (Anon ttype rblock) = do
+eval (Anon TBool (SRBlock d fd st exp)) = do
     env <- ask
-    local (const env) (evalRetBlock rblock)
+    val <- local (const env) (evalRetBlock (SRBlock d fd st exp))
+    case val of
+        VBool val -> return (VBool val)
+        CBool val -> return (VBool val)
+        _ -> error("Zły typ zwracany przez funkcję anonimową: " ++ show(exp))
+
+eval (Anon TInt (SRBlock d fd st exp)) = do
+    env <- ask
+    val <- local (const env) (evalRetBlock (SRBlock d fd st exp))
+    case val of
+        IVal val -> return (IVal val)
+        CVal val -> return (IVal val)
+        _ -> error("Zły typ zwracany przez funkcję anonimową: " ++ show())
 
 eval (Etrue)  = return (VBool True)
 
@@ -334,9 +351,22 @@ evalFuncDecl (FDec id args rtype rblock) = do
     env <- ask
     env' <- return $ M.insert (evalId(id)) newLoc env
     modify (M.insert newLoc (Func env' rtype args rblock))
+    env'' <- createEnv env' args
+    local (const env'') (eval (Anon rtype rblock))
+--    val <- local (const env) (evalRetBlock (SRBlock d fd st exp))
+--    case rtype
     return env'
     where
     checkArgs (Args t id) = checkRedeclared(id)
+    createEnv env [] = return env
+    createEnv env (Args ttype idd:args) = do
+        Just (IVal newLoc) <- gets (M.lookup 0)
+        case ttype of
+            TInt  -> modify (M.insert newLoc (IVal 1))
+            TBool -> modify (M.insert newLoc (VBool True))
+        modify (M.insert 0 (IVal (newLoc+1)))
+        env' <- (return $ M.insert (evalId(idd)) newLoc env)
+        createEnv env' args
 
 evalFuncDecls :: [FunctionDeclaration] -> Semantics Env
 evalFuncDecls [] = ask

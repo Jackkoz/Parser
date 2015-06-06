@@ -119,6 +119,21 @@ eval (EDiv exp1 exp2) = do
     else
         return (IVal (div val1 val2))
 
+eval (ECast exp TInt) = do
+    val <- eval exp
+    case val of
+        VBool val -> return (IVal (if (val) then 1 else 0))
+        CBool val -> return (IVal (if (val) then 1 else 0))
+        IVal val -> return (IVal val)
+        CVal val -> return (IVal val)
+eval (ECast exp TBool) = do
+    val <- eval exp
+    case val of
+        VBool val -> return (VBool val)
+        CBool val -> return (VBool val)
+        IVal val -> return (VBool (val /= 0))
+        CVal val -> return (VBool (val /= 0))
+
 eval (EMinus exp) = do
     val <- eval exp
     case val of

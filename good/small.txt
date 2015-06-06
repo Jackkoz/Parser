@@ -5,7 +5,7 @@ const int test = 0;
 # y (z punktu widzenia bloku main)
 function plus (int x, int z) : int
 {
-    int y;
+    int y = (true as int);
     y = x + z;
     return y;
 }
@@ -57,7 +57,7 @@ main
     factorial(5);
     x = 5;
     x = factorial(&x);
-    y = execute bool {print(x); return true;};
+    y = execute bool {int asd; print(x); return true;};
     print("Test");
 
     if (true) {} else {}
