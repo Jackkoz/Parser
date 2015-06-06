@@ -3,8 +3,8 @@ entrypoints Program ;
 --Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
 Prog.       Program     ::=     [Decl] [FunctionDeclaration] "main" Block ;
 
-SBlock.		Block 		::=     "{" [Decl] [Stmt] "}" ;
-SRBlock. 	RBlock 		::=     "{" [Decl] [Stmt] "return" Expression ";" "}" ;
+SBlock.		Block 		::=     "{" [Decl] [FunctionDeclaration] [Stmt] "}" ;
+SRBlock. 	RBlock 		::=     "{" [Decl] [FunctionDeclaration] [Stmt] "return" Expression ";" "}" ;
 
 Declr.          Decl    ::=     Type Identifier ;
 DAssign.        Decl    ::=     Type Identifier "=" Expression ;
