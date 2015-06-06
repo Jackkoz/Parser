@@ -62,6 +62,7 @@ EDiv.    Exp4 ::= Exp4 "/" Exp5 ;
 EMinus.  Exp5 ::= "-" Exp6 ;
 
 Call.    Exp6 ::= Identifier "(" [CallArgs] ")"  ;
+Anon.    Exp6 ::= "execute" Type RBlock ;
 EVar.    Exp6 ::= Identifier    ;
 EInt.    Exp6 ::= Integer       ;
 Etrue.   Exp6 ::= "true"        ;
