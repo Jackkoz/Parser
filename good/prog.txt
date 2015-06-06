@@ -25,11 +25,36 @@ function dec (int x) : int {
     return x;
 }
 
-main {
+function nest1 (int x) : int
+{
+    function nest2 (int y) : int
+    {
+        function nest3 (int z) : int
+        {
+            return nest2(z) + 1;
+        }
+        y++;
+        return y < 3 ? nest3(y) + 1 : y;
+    }
+
+    return nest2(x) + 1;
+}
+
+main
+{
     # Deklaracja zmiennej x z wartością 5
     int x = 5;
     # Deklaracja zmiennej y z domyślną wartością 0
     int y;
+
+    print("*** For ***");
+        from 1 to 5 as loop do
+        {
+            print(loop);
+        }
+        print("Koniec for");
+    # Zmienna loop w tym miejscu nie istnieje
+    # print(loop);
 
     print("*** Test funkcji ***");
     print(plus(x,y+1));
@@ -41,17 +66,12 @@ main {
     print("*** Test rekurencji ***");
     print(factorial(5));
 
+    print("*** Zagniezdzanie ***");
+    print(nest1(y));
+    print("*** ***");
+
     # Wykorzystanie funkcji jako procedury
     factorial(5);
-
-    print("*** For ***");
-    from 1 to 5 as loop do
-    {
-        print(loop);
-    }
-    print("Koniec for");
-    # Zmienna loop w tym miejscu nie istnieje
-    # print(loop);
 
     # Test zmiennej globalnej
     print(test);
