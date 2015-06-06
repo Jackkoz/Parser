@@ -46,11 +46,11 @@ The reserved words used in Gram are the following: \\
 
 \begin{tabular}{lll}
 {\reserved{as}} &{\reserved{bool}} &{\reserved{const}} \\
-{\reserved{do}} &{\reserved{else}} &{\reserved{false}} \\
-{\reserved{from}} &{\reserved{function}} &{\reserved{guard}} \\
-{\reserved{in}} &{\reserved{int}} &{\reserved{main}} \\
-{\reserved{print}} &{\reserved{return}} &{\reserved{to}} \\
-{\reserved{true}} &{\reserved{while}} & \\
+{\reserved{do}} &{\reserved{else}} &{\reserved{execute}} \\
+{\reserved{false}} &{\reserved{from}} &{\reserved{function}} \\
+{\reserved{guard}} &{\reserved{in}} &{\reserved{int}} \\
+{\reserved{main}} &{\reserved{print}} &{\reserved{return}} \\
+{\reserved{to}} &{\reserved{true}} &{\reserved{while}} \\
 \end{tabular}\\
 
 The symbols used in Gram are the following: \\
@@ -200,6 +200,7 @@ All other symbols are terminals.\\
 
 \begin{tabular}{lll}
 {\nonterminal{Exp6}} & {\arrow}  &{\nonterminal{Identifier}} {\terminal{(}} {\nonterminal{ListCallArgs}} {\terminal{)}}  \\
+ & {\delimit}  &{\terminal{execute}} {\nonterminal{Type}} {\nonterminal{RBlock}}  \\
  & {\delimit}  &{\nonterminal{Identifier}}  \\
  & {\delimit}  &{\nonterminal{Integer}}  \\
  & {\delimit}  &{\terminal{true}}  \\

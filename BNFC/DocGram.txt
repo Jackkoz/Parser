@@ -32,10 +32,10 @@ The set of reserved words is the set of terminals appearing in the grammar. Thos
 
 The reserved words used in Gram are the following:
   | ``as`` | ``bool`` | ``const`` | ``do``
-  | ``else`` | ``false`` | ``from`` | ``function``
-  | ``guard`` | ``in`` | ``int`` | ``main``
-  | ``print`` | ``return`` | ``to`` | ``true``
-  | ``while`` |  |  | 
+  | ``else`` | ``execute`` | ``false`` | ``from``
+  | ``function`` | ``guard`` | ``in`` | ``int``
+  | ``main`` | ``print`` | ``return`` | ``to``
+  | ``true`` | ``while`` |  | 
 
 The symbols used in Gram are the following:
   | { | } | ; | =
@@ -109,6 +109,7 @@ All other symbols are terminals.
   | //Exp5// | -> | ``-`` //Exp6// 
   |  |  **|**  | //Exp6// 
   | //Exp6// | -> | //Identifier// ``(`` //[CallArgs]// ``)`` 
+  |  |  **|**  | ``execute`` //Type// //RBlock// 
   |  |  **|**  | //Identifier// 
   |  |  **|**  | //Integer// 
   |  |  **|**  | ``true`` 

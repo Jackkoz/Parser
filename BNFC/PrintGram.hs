@@ -183,6 +183,7 @@ instance Print Exp where
    EDiv exp0 exp -> prPrec i 4 (concatD [prt 4 exp0 , doc (showString "/") , prt 5 exp])
    EMinus exp -> prPrec i 5 (concatD [doc (showString "-") , prt 6 exp])
    Call identifier callargss -> prPrec i 6 (concatD [prt 0 identifier , doc (showString "(") , prt 0 callargss , doc (showString ")")])
+   Anon type' rblock -> prPrec i 6 (concatD [doc (showString "execute") , prt 0 type' , prt 0 rblock])
    EVar identifier -> prPrec i 6 (concatD [prt 0 identifier])
    EInt n -> prPrec i 6 (concatD [prt 0 n])
    Etrue  -> prPrec i 6 (concatD [doc (showString "true")])

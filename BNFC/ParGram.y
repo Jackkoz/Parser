@@ -43,22 +43,23 @@ import ErrM
  'do' { PT _ (TS _ 26) }
  'else' { PT _ (TS _ 27) }
  'else if (' { PT _ (TS _ 28) }
- 'false' { PT _ (TS _ 29) }
- 'from' { PT _ (TS _ 30) }
- 'function' { PT _ (TS _ 31) }
- 'guard' { PT _ (TS _ 32) }
- 'if (' { PT _ (TS _ 33) }
- 'in' { PT _ (TS _ 34) }
- 'int' { PT _ (TS _ 35) }
- 'main' { PT _ (TS _ 36) }
- 'print' { PT _ (TS _ 37) }
- 'return' { PT _ (TS _ 38) }
- 'to' { PT _ (TS _ 39) }
- 'true' { PT _ (TS _ 40) }
- 'while' { PT _ (TS _ 41) }
- '{' { PT _ (TS _ 42) }
- '||' { PT _ (TS _ 43) }
- '}' { PT _ (TS _ 44) }
+ 'execute' { PT _ (TS _ 29) }
+ 'false' { PT _ (TS _ 30) }
+ 'from' { PT _ (TS _ 31) }
+ 'function' { PT _ (TS _ 32) }
+ 'guard' { PT _ (TS _ 33) }
+ 'if (' { PT _ (TS _ 34) }
+ 'in' { PT _ (TS _ 35) }
+ 'int' { PT _ (TS _ 36) }
+ 'main' { PT _ (TS _ 37) }
+ 'print' { PT _ (TS _ 38) }
+ 'return' { PT _ (TS _ 39) }
+ 'to' { PT _ (TS _ 40) }
+ 'true' { PT _ (TS _ 41) }
+ 'while' { PT _ (TS _ 42) }
+ '{' { PT _ (TS _ 43) }
+ '||' { PT _ (TS _ 44) }
+ '}' { PT _ (TS _ 45) }
 
 L_quoted { PT _ (TL $$) }
 L_integ  { PT _ (TI $$) }
@@ -196,6 +197,7 @@ Exp5 : '-' Exp6 { EMinus $2 }
 
 Exp6 :: { Exp }
 Exp6 : Identifier '(' ListCallArgs ')' { Call $1 $3 } 
+  | 'execute' Type RBlock { Anon $2 $3 }
   | Identifier { EVar $1 }
   | Integer { EInt $1 }
   | 'true' { Etrue }

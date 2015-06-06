@@ -72,6 +72,7 @@ data Exp =
  | EDiv Exp Exp
  | EMinus Exp
  | Call Identifier [CallArgs]
+ | Anon Type RBlock
  | EVar Identifier
  | EInt Integer
  | Etrue
