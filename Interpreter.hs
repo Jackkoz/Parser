@@ -50,8 +50,6 @@ eval (EVar id) = do
                 CVal val -> do
                     return val
 
-        Nothing  -> error ("Undeclared variable: " ++ (evalId id))
-
 eval (Eor  exp1 exp2) = do
     val1 <- eval exp1
     if (val1 /= 0)
@@ -291,7 +289,7 @@ redeclareConst id = do
         IVal val -> do
             modify (M.insert loc (CVal val))
         CVal val -> do
-            error ("Incorrect parameter in guard statement, already a constant: " ++ evalId(id))
+            error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
 
 redeclareVar :: Identifier -> Semantics ()
 redeclareVar id = do
@@ -432,7 +430,7 @@ checkIsNotConst (id) = do
                 Just (IVal val) ->
                     return ()
                 _ -> do
-                    error("Nielegalne przypisanie do funkcji " ++ (evalId id))
+                    error("Nielegalna próba przypisania do funkcji " ++ (evalId id))
         Nothing -> return ()
 
 checkIsFunction (id) = do
