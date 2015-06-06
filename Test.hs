@@ -11,6 +11,7 @@ import AbsGram
 import ErrM
 
 import Interpreter
+import Typechecker
 
 main :: IO ()
 main = do
@@ -25,6 +26,8 @@ main = do
                 input <- readFile fileName
                 case pProgram (myLexer input) of
                     Bad s -> putStrLn s
-                    Ok  p -> execProgram p
+                    Ok  p -> do
+                        typeCheck   p
+                        execProgram p
             else do
                 putStrLn $ fileName ++ " does not exist"
