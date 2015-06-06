@@ -126,15 +126,23 @@ eval (Call id vals) = do
 
     where
     createEnv env [] [] = return env
-    createEnv env (arg:args) (Cargs val:vals) = do
-        case arg of
-            Args ttype id -> do
-                val' <- evalE val
-                Just (IVal newLoc) <- gets (M.lookup 0)
-                modify (M.insert newLoc (IVal val'))
-                modify (M.insert 0 (IVal (newLoc+1)))
-                env' <- (return $ M.insert (evalId(id)) newLoc env)
+    createEnv env (Args ttype id:args) (Cargs val:vals) = do
+        val' <- evalE val
+        Just (IVal newLoc) <- gets (M.lookup 0)
+        modify (M.insert newLoc (IVal val'))
+        modify (M.insert 0 (IVal (newLoc+1)))
+        env' <- (return $ M.insert (evalId(id)) newLoc env)
+        createEnv env' args vals
+
+    createEnv env (Args ttype id:args) (Ref ref:vals) = do
+        Just (IVal newLoc) <- gets (M.lookup 0)
+        loc <-asks (M.lookup (evalId(ref)))
+        case loc of
+            Just loc -> do
+                env' <- (return $ M.insert (evalId(id)) loc env)
                 createEnv env' args vals
+            Nothing ->
+                error ("Identyfikator nie jest zadeklarowany: " ++ evalId(id))
 
 eval (Etrue)  = return 1
 
@@ -151,21 +159,45 @@ evalRetBlock (SRBlock decls stmts exp) = do
 -- ASSIGNMENTS
 
 checkConst (id) = do
-    Just loc <-asks (M.lookup (evalId id))
-    Just val <- gets (M.lookup loc)
-    case val of
-        CVal val -> do
-            error ("Illegal assignement to const variable: " ++ (evalId id))
-        IVal val -> return ()
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            val <- gets (M.lookup loc)
+            case val of
+                Just (CVal val) -> do
+                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
+                Just (IVal val) ->
+                    return ()
+                _ -> do
+                    error("Nielegalne przypisanie do funkcji " ++ (evalId id))
+        Nothing -> return ()
+
+checkRedeclared (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            error("Identyfikator jest już w użyciu: " ++ (evalId(id)))
+        Nothing ->
+            return ()
+
+checkUndeclared (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc ->
+            return ()
+        Nothing -> do
+            error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
 
 interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
+    checkUndeclared(id)
     checkConst(id)
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     modify (M.insert loc (IVal val))
 
 interpretA (AArith id AAPlus exp) = do
+    checkUndeclared(id)
     checkConst(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
@@ -173,6 +205,7 @@ interpretA (AArith id AAPlus exp) = do
     modify (M.insert loc (IVal (val1 + val2)))
 
 interpretA (AArith id AAMinus exp) = do
+    checkUndeclared(id)
     checkConst(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
@@ -180,6 +213,7 @@ interpretA (AArith id AAMinus exp) = do
     modify (M.insert loc (IVal (val2 - val1)))
 
 interpretA (AArith id AAMulti exp) = do
+    checkUndeclared(id)
     checkConst(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
@@ -194,12 +228,14 @@ interpretA (AArith id AADiv exp) = do
     modify (M.insert loc (IVal (div val2  val1)))
 
 interpretA (AIncDec id Increment) = do
+    checkUndeclared(id)
     checkConst(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val + 1)))
 
 interpretA (AIncDec id Decrement) = do
+    checkUndeclared(id)
     checkConst(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
@@ -270,6 +306,7 @@ redeclareVar id = do
 
 evalFuncDecl :: FunctionDeclaration -> Semantics Env
 evalFuncDecl (FDec id args rtype rblock) = do
+    checkRedeclared(id)
     Just (IVal newLoc) <- gets (M.lookup 0)
 
     modify (M.insert 0 (IVal (newLoc+1)))

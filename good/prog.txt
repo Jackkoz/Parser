@@ -15,6 +15,16 @@ function factorial (int f) : int
     return f > 1 ? f * factorial(f - 1) : 1;
 }
 
+function inc (int x) : int {
+    x++;
+    return x;
+}
+
+function dec (int x) : int {
+    x--;
+    return x;
+}
+
 main {
     # Deklaracja zmiennej x z wartością 5
     int x = 5;
@@ -23,6 +33,10 @@ main {
 
     print("*** Test funkcji ***");
     print(plus(x,y+1));
+    inc(&y);
+    print(y);
+    dec(&y);
+    print(y);
 
     print("*** Test rekurencji ***");
     print(factorial(5));

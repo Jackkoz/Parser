@@ -11,7 +11,7 @@ type CInteger = Integer
 
 data Val = IVal Integer | CVal Integer
     | Func Env Type [Arguments] RBlock
-    | Proc Env [Arguments] Block
+--    | Proc Env [Arguments] Block
     deriving (Eq, Ord, Show)
 
 type Loc = Integer
