@@ -6,9 +6,6 @@ import Control.Monad.State
 
 import AbsGram
 
--- for keeping track of const values
-type CInteger = Integer
-
 data Val = IVal Integer | CVal Integer
     | Func Env Type [Arguments] RBlock
 --    | Proc Env [Arguments] Block
