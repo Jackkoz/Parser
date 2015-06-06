@@ -21,12 +21,12 @@ transProgram x = case x of
 
 transBlock :: Block -> Result
 transBlock x = case x of
-  SBlock decls stmts  -> failure x
+  SBlock decls functiondeclarations stmts  -> failure x
 
 
 transRBlock :: RBlock -> Result
 transRBlock x = case x of
-  SRBlock decls stmts expression  -> failure x
+  SRBlock decls functiondeclarations stmts expression  -> failure x
 
 
 transDecl :: Decl -> Result

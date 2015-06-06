@@ -77,11 +77,11 @@ Program : ListDecl ListFunctionDeclaration 'main' Block { Prog (reverse $1) (rev
 
 
 Block :: { Block }
-Block : '{' ListDecl ListStmt '}' { SBlock (reverse $2) (reverse $3) } 
+Block : '{' ListDecl ListFunctionDeclaration ListStmt '}' { SBlock (reverse $2) (reverse $3) (reverse $4) } 
 
 
 RBlock :: { RBlock }
-RBlock : '{' ListDecl ListStmt 'return' Expression ';' '}' { SRBlock (reverse $2) (reverse $3) $5 } 
+RBlock : '{' ListDecl ListFunctionDeclaration ListStmt 'return' Expression ';' '}' { SRBlock (reverse $2) (reverse $3) (reverse $4) $6 } 
 
 
 Decl :: { Decl }

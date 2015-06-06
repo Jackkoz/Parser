@@ -9,11 +9,11 @@ data Program =
   deriving (Eq,Ord,Show)
 
 data Block =
-   SBlock [Decl] [Stmt]
+   SBlock [Decl] [FunctionDeclaration] [Stmt]
   deriving (Eq,Ord,Show)
 
 data RBlock =
-   SRBlock [Decl] [Stmt] Expression
+   SRBlock [Decl] [FunctionDeclaration] [Stmt] Expression
   deriving (Eq,Ord,Show)
 
 data Decl =

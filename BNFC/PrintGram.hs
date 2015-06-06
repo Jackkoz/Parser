@@ -90,12 +90,12 @@ instance Print Program where
 
 instance Print Block where
   prt i e = case e of
-   SBlock decls stmts -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 stmts , doc (showString "}")])
+   SBlock decls functiondeclarations stmts -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 functiondeclarations , prt 0 stmts , doc (showString "}")])
 
 
 instance Print RBlock where
   prt i e = case e of
-   SRBlock decls stmts expression -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 stmts , doc (showString "return") , prt 0 expression , doc (showString ";") , doc (showString "}")])
+   SRBlock decls functiondeclarations stmts expression -> prPrec i 0 (concatD [doc (showString "{") , prt 0 decls , prt 0 functiondeclarations , prt 0 stmts , doc (showString "return") , prt 0 expression , doc (showString ";") , doc (showString "}")])
 
 
 instance Print Decl where

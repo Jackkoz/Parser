@@ -56,8 +56,8 @@ and **eps** (empty rule) belong to the BNF notation.
 All other symbols are terminals.
 
   | //Program// | -> | //[Decl]// //[FunctionDeclaration]// ``main`` //Block// 
-  | //Block// | -> | ``{`` //[Decl]// //[Stmt]// ``}`` 
-  | //RBlock// | -> | ``{`` //[Decl]// //[Stmt]// ``return`` //Expression// ``;`` ``}`` 
+  | //Block// | -> | ``{`` //[Decl]// //[FunctionDeclaration]// //[Stmt]// ``}`` 
+  | //RBlock// | -> | ``{`` //[Decl]// //[FunctionDeclaration]// //[Stmt]// ``return`` //Expression// ``;`` ``}`` 
   | //Decl// | -> | //Type// //Identifier// 
   |  |  **|**  | //Type// //Identifier// ``=`` //Expression// 
   |  |  **|**  | ``const`` //Type// //Identifier// ``=`` //Expression// 
