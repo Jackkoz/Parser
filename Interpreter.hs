@@ -38,6 +38,8 @@ eval :: Exp -> Semantics Integer
 eval (EInt i) = return i
 
 eval (EVar id) = do
+    checkIsDeclared(id)
+    checkIsVar(id)
     loc <- asks (M.lookup (evalId id))
     case loc of
         Just loc -> do
@@ -47,22 +49,29 @@ eval (EVar id) = do
                     return val
                 CVal val -> do
                     return val
-        Nothing  -> error ("Undeclared variable: " ++ (evalId id))
 
+        Nothing  -> error ("Undeclared variable: " ++ (evalId id))
 
 eval (Eor  exp1 exp2) = do
     val1 <- eval exp1
-    val2 <- eval exp2
-    if (or [val1 /= 0, val2 /= 0])
-        then return 1
-        else return 0
+    if (val1 /= 0)
+    then return 1
+    else do
+        val2 <- eval exp2
+        if (or [val1 /= 0, val2 /= 0])
+            then return 1
+            else return 0
 
 eval (Eand  exp1 exp2) = do
     val1 <- eval exp1
-    val2 <- eval exp2
-    if (and [val1 /= 0, val2 /= 0])
-        then return 1
-        else return 0
+    if (val1 /= 0)
+    then do
+        val2 <- eval exp2
+        if (and [val1 /= 0, val2 /= 0])
+            then return 1
+            else return 0
+    else return 0
+
 
 eval (Eeq  exp1 exp2) = do
     val1 <- eval exp1
@@ -148,95 +157,74 @@ eval (Etrue)  = return 1
 
 eval (Efalse) = return 0
 
-evalRetBlock (SRBlock decls stmts exp) = do
+evalRetBlock (SRBlock decls fdecls stmts exp) = do
 --    interpretB (SBlock decls stmts)
     env' <- evalDecls decls
-    local (const env') (mapM_ interpret stmts)
-    local (const env') (evalE exp)
+    env'' <- local (const env') (evalFuncDecls fdecls)
+    local (const env'') (mapM_ interpret stmts)
+    local (const env'') (evalE exp)
 
 -- *****
 
 -- ASSIGNMENTS
 
-checkConst (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            val <- gets (M.lookup loc)
-            case val of
-                Just (CVal val) -> do
-                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
-                Just (IVal val) ->
-                    return ()
-                _ -> do
-                    error("Nielegalne przypisanie do funkcji " ++ (evalId id))
-        Nothing -> return ()
-
-checkRedeclared (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            error("Identyfikator jest już w użyciu: " ++ (evalId(id)))
-        Nothing ->
-            return ()
-
-checkUndeclared (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc ->
-            return ()
-        Nothing -> do
-            error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
-
 interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     modify (M.insert loc (IVal val))
 
 interpretA (AArith id AAPlus exp) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 + val2)))
 
 interpretA (AArith id AAMinus exp) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val2 - val1)))
 
 interpretA (AArith id AAMulti exp) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 * val2)))
 
 interpretA (AArith id AADiv exp) = do
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     val1 <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (div val2  val1)))
 
 interpretA (AIncDec id Increment) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val + 1)))
 
 interpretA (AIncDec id Decrement) = do
-    checkUndeclared(id)
-    checkConst(id)
+    checkIsDeclared(id)
+    checkIsNotConst(id)
+    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val - 1)))
@@ -290,6 +278,7 @@ evalDecls (decl:decls) = do
 
 redeclareConst :: Identifier -> Semantics ()
 redeclareConst id = do
+    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just val <- gets (M.lookup loc)
     case val of
@@ -307,6 +296,7 @@ redeclareVar id = do
 evalFuncDecl :: FunctionDeclaration -> Semantics Env
 evalFuncDecl (FDec id args rtype rblock) = do
     checkRedeclared(id)
+    mapM_ checkArgs args
     Just (IVal newLoc) <- gets (M.lookup 0)
 
     modify (M.insert 0 (IVal (newLoc+1)))
@@ -314,6 +304,8 @@ evalFuncDecl (FDec id args rtype rblock) = do
     env' <- return $ M.insert (evalId(id)) newLoc env
     modify (M.insert newLoc (Func env' rtype args rblock))
     return env'
+    where
+    checkArgs (Args t id) = checkRedeclared(id)
 
 evalFuncDecls :: [FunctionDeclaration] -> Semantics Env
 evalFuncDecls [] = ask
@@ -414,8 +406,65 @@ interpretEIf ((SEIf exp b):eifs) = do
         else interpretB b
 
 interpretB :: Block -> Semantics ()
-interpretB (SBlock decls stmts) = do
+interpretB (SBlock decls fdecls stmts) = do
     env' <- evalDecls decls
-    local (const env') (mapM_ interpret stmts)
+    env'' <- local (const env') (evalFuncDecls fdecls)
+    local (const env'') (mapM_ interpret stmts)
+
+-- *****
+
+-- CHECKS
+
+checkIsNotConst (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            val <- gets (M.lookup loc)
+            case val of
+                Just (CVal val) -> do
+                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
+                Just (IVal val) ->
+                    return ()
+                _ -> do
+                    error("Nielegalne przypisanie do funkcji " ++ (evalId id))
+        Nothing -> return ()
+
+checkIsFunction (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            val <- gets (M.lookup loc)
+            case val of
+                Just (Func _ _ _ _) -> do
+                    return ()
+                _ -> do
+                    error("Identyfikator wywołania nie jest przypisany do funkcji: " ++ evalId(id))
+
+checkIsVar (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            val <- gets (M.lookup loc)
+            case val of
+                Just (Func _ _ _ _) -> do
+                    error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
+                _ -> do
+                    return ()
+
+checkRedeclared (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc -> do
+            error("Identyfikator jest już w użyciu: " ++ (evalId(id)))
+        Nothing ->
+            return ()
+
+checkIsDeclared (id) = do
+    loc <-asks (M.lookup (evalId id))
+    case loc of
+        Just loc ->
+            return ()
+        Nothing -> do
+            error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
 
 -- *****
