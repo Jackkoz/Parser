@@ -107,6 +107,7 @@ All other symbols are terminals.
   |  |  **|**  | //Exp4// ``/`` //Exp5// 
   |  |  **|**  | //Exp5// 
   | //Exp5// | -> | ``-`` //Exp6// 
+  |  |  **|**  | ``(`` //Exp6// ``as`` //Type// ``)`` 
   |  |  **|**  | //Exp6// 
   | //Exp6// | -> | //Identifier// ``(`` //[CallArgs]// ``)`` 
   |  |  **|**  | ``execute`` //Type// //RBlock// 

@@ -192,6 +192,7 @@ Exp4 : Exp4 '*' Exp5 { EMul $1 $3 }
 
 Exp5 :: { Exp }
 Exp5 : '-' Exp6 { EMinus $2 } 
+  | '(' Exp6 'as' Type ')' { ECast $2 $4 }
   | Exp6 { $1 }
 
 

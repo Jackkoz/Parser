@@ -93,6 +93,7 @@ transExp x = case x of
   EMul exp0 exp  -> failure x
   EDiv exp0 exp  -> failure x
   EMinus exp  -> failure x
+  ECast exp type'  -> failure x
   Call identifier callargss  -> failure x
   Anon type' rblock  -> failure x
   EVar identifier  -> failure x

@@ -71,6 +71,7 @@ data Exp =
  | EMul Exp Exp
  | EDiv Exp Exp
  | EMinus Exp
+ | ECast Exp Type
  | Call Identifier [CallArgs]
  | Anon Type RBlock
  | EVar Identifier
