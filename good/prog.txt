@@ -52,7 +52,7 @@ main
         {
             print(loop);
         }
-        print("Koniec for");
+
     # Zmienna loop w tym miejscu nie istnieje
     # print(loop);
 
@@ -68,6 +68,9 @@ main
 
     print("*** Zagniezdzanie ***");
     print(nest1(y));
+
+    print("*** Test funkcji anonimowej ***");
+    print(execute int {int nested = 0; return nest1(nested);});
     print("*** ***");
 
     # Wykorzystanie funkcji jako procedury

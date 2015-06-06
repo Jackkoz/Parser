@@ -125,6 +125,8 @@ eval (EMinus exp) = do
     return (-val)
 
 eval (Call id vals) = do
+    checkIsDeclared(id)
+    checkIsFunction(id)
     Just loc <-asks (M.lookup (evalId id))
     Just f <- gets (M.lookup loc)
     case f of
@@ -152,6 +154,10 @@ eval (Call id vals) = do
                 createEnv env' args vals
             Nothing ->
                 error ("Identyfikator nie jest zadeklarowany: " ++ evalId(id))
+
+eval (Anon ttype rblock) = do
+    env <- ask
+    local (const env) (evalRetBlock rblock)
 
 eval (Etrue)  = return 1
 
