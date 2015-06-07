@@ -1,24 +1,25 @@
-# TODO
- - Polskie litery w princie
-
 # Parser
 JIPP 2015 - Parser
 
 Język prezentuje składnię zbliżoną do C++/Javy. Oferuje wsparcie dla:
+- Komentarzy
 - Zmiennych oraz stałych
 - Arytmetyki liczbowej oraz boolowskiej (z leniwym wyliczaniem)
 - Kontroli typowania
 - Operacji rzutowania
 - If + While + For
 - Blok guard, który na czas wykonania zamienia zmienne na stałe
-- Wyrażenia ternarne (x = bexp ? exp : elseExp)
-- Operacja print pozwalająca na wypisywanie wyrażeń lub napisów na ekran
-- Dodatkowe operatory przypisania: ++ i -- oraz += *= -= /=
-- Funkcje zwracające wartość
-- Przekazywanie przez referencję i przez wartość
-- Rekurencja
-- Funkcje anonimowe
-- Dowolne zagnieżdżanie funkcji
-- Przesłanianie identyfikatorów
-- Terminująca faza typowania przed uruchomieniem programu
-- Jawna obsługa dynamicznych błędów wykonania
+- Wyrażeń ternarnych (x = bexp ? exp : elseExp)
+- Operacji print pozwalającej na wypisywanie wyrażeń lub napisów na ekran
+- Dodatkowych operatorów przypisania: ++ i -- oraz += *= -= /=
+- Funkcji zwracających wartość
+- Przekazywania przez referencję i przez wartość
+- Rekurencji
+- Funkcji anonimowych
+- Dowolnego zagnieżdżania funkcji
+- Przesłaniania identyfikatorów
+- Terminującej fazy typowania przed uruchomieniem programu
+- Jawnej obsługi dynamicznych błędów wykonania
+
+Zamiast przykładów w katalogu bad pozostawiłem zakomentowane linijki w przykładach
+z katalogu good, które obrazują przykłady błędów w ich naturalnym środowisku

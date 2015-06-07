@@ -10,6 +10,7 @@ function plus (int x, int z) : int
     return y;
 }
 
+# Rekurencja
 function factorial (int f) : int
 {
     return f > 1 ? f * factorial(f - 1) : 1;
@@ -25,6 +26,7 @@ function dec (int x) : int {
     return x;
 }
 
+# Przykład zagnieżdżonych funkcji
 function nest1 (int x) : int
 {
     function nest2 (int y) : int
@@ -54,9 +56,9 @@ main
 
     print("*** For ***");
         from 1 to 5 as loop do
-        {
-            print(loop);
-        }
+    {
+        print(loop);
+    }
 
     # Zmienna loop w tym miejscu nie istnieje
     # print(loop);
@@ -71,7 +73,7 @@ main
     print("*** Test rekurencji ***");
     print(factorial(5));
 
-    print("*** Zagniezdzanie ***");
+    print("*** Test zagnieżdżania ***");
     print(nest1(y));
 
     print("*** Test funkcji anonimowej ***");
@@ -97,21 +99,18 @@ main
         # x++;
     }
 
-    # Zwikszenie x o 1, powinno wypisa si 6
+    # Zwiększenie wartości x o 1, legalne po bloku guard
     x++;
     print(x);
 
-    # x == 6, zatem oczekujemy "true" na konsoli
     print("*** Test logiki boolowskiej ***");
     if (x > 3)
     {
         print(true);
     }
-    # Obie ponisze linijki wypisayby 12, ale nie powinny zaj
-    else if (true) {print (x * 2);}
-    else {print (x*2);}
+    else if (true) {print("Wrong");}
+    else {print("Wrong");}
 
-    # x to nadal 6, oczekujemy faszu na konsoli
     if (x > 2 && x < 4)
         {x += 1;}
     else
@@ -119,7 +118,7 @@ main
         print (false);
     }
 
-    # Powinny wypisa si wartoci od 7 do 10
+    # Przykład pętli while
     while (x < 10 || x < 9)
     {
         x++;
@@ -127,19 +126,17 @@ main
     }
 
     # Ternary expression jak w Javie/C++
-    # y == 0 z domylnej definicji, wic oczekujemy '1' na konosli
+    # y == 0 z domylnej definicji, więc oczekujemy '1' na konosli
     y = y == 0 ? 1 : -1;
     print(y);
 
-    # Dzielenie jest cakowitoliczbowe, wic powinno wypisa si 0
-    print(y / 2);
+    # Dzielenie jest całkowitoliczbowe, więc powinno wypisać się 0
+    print(y / (2 * y));
 
-    # Powinno wypisa si 5
     y = 10;
     y /= 2;
     print(y);
 
-    # x == 10 y == 5, powinno wypisa si 61
     print (x * (y + 1) + 1);
 
     print(1 > 2);

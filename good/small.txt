@@ -1,8 +1,7 @@
 # Deklaracja zmiennej globalnej
 const int test = 8;
 
-# Prosta funkcja operuj�ca na dw�ch argumentach i przes�oni�tym
-# y (z punktu widzenia bloku main)
+# Prosta funkcja operująca na dwóch argumentach i przesłonięciach
 function plus (int x, int z) : int
 {
     int y = (true as int);
@@ -10,6 +9,7 @@ function plus (int x, int z) : int
     return y;
 }
 
+# Rekurencja i wyrażenia ternarne
 function factorial (int f) : int
 {
     int x;
@@ -18,8 +18,7 @@ function factorial (int f) : int
 
 function inc (int x) : int {
     x++;
-    return x;
-}
+    return x; }
 
 function dec (int x) : int
 {
@@ -29,19 +28,28 @@ function dec (int x) : int
 
 main
 {
-    # Zakomentowane nie dzia�aj�
+    # Zakomentowane nie działają
     int x = 5;
-    #bool y = 5;
+    # Przypisanie wartości innego typu
+    # bool y = 5;
     bool y = false;
     int tab[10];
+    # Nie działająca redeklaracja
+    # bool y;
     print(test);
-    #bool y;
+    # Deklaracja w bloku instrukcji
+    # bool nieDziałam;
     x++;
     x--;
-    #x = y;
+    # Przypisanie wartości złego typu
+    # x = y;
     inc(x);
     factorial(&x);
-    #factorial(y);
+    # Podanie parametru złego typu
+    # factorial(y);
+    # Podanie złej liczby parametrów
+    # factorial();
+    # factorial(x,x);
     from 1 to 5 as loop do
     {
         x++;
@@ -51,7 +59,7 @@ main
     {
         x++;
     }
-    # Blok guard: x w �rodku b�dzie sta��
+    # Blok guard: x w środku będzie stałą
     guard (x) in {
         print(x);
     }
@@ -60,12 +68,13 @@ main
     factorial(5);
     x = 5;
     x = factorial(&x);
+    # Bardzo fantazyjne opakowanie na instrukcję print funkcją anonimową
     y = execute bool {int asd; print(x); return true;};
-    print("Test");
 
+    print("Test");
     if (true) {} else {}
     if (x > 3)
-    {}
+    {print(x > 3);}
     else if (true) {print ("Error");}
     else {print ("Error");}
 
@@ -74,7 +83,11 @@ main
         {print("Error");}
     else {}
 
-    print(true);
+    print(factorial(5) == 123 && true);
+    # Błędny typ w wyrażeniu logicznym
+    # print(factorial(5) == 123 && 1);
+
+    # Trochę arytmetyki w obu wydaniach
     print(-(true && false));
     print(5);
     print(-5);
