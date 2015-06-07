@@ -43,8 +43,9 @@ The symbols used in Gram are the following:
   | , | if ( | else if ( | ?
   | || | && | == | <
   | > | + | - | *
-  | / | += | -= | *=
-  | /= | ++ | -- | 
+  | / | [ | ] | +=
+  | -= | *= | /= | ++
+  | -- |  |  | 
 
 ===Comments===
 Single-line comments begin with #.There are no multiple-line comments in the grammar.
@@ -122,6 +123,7 @@ All other symbols are terminals.
   | //Type// | -> | ``int`` 
   |  |  **|**  | ``bool`` 
   | //Identifier// | -> | //Ident// 
+  |  |  **|**  | //Ident// ``[`` //Integer// ``]`` 
   | //[Identifier]// | -> | //Identifier// 
   |  |  **|**  | //Identifier// ``,`` //[Identifier]// 
   | //ArAssign// | -> | ``+=`` 

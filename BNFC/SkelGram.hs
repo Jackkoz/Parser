@@ -118,6 +118,7 @@ transType x = case x of
 transIdentifier :: Identifier -> Result
 transIdentifier x = case x of
   Id id  -> failure x
+  Arr id n  -> failure x
 
 
 transArAssign :: ArAssign -> Result

@@ -63,8 +63,9 @@ The symbols used in Gram are the following: \\
 {\symb{{$|$}{$|$}}} &{\symb{\&\&}} &{\symb{{$=$}{$=$}}} \\
 {\symb{{$<$}}} &{\symb{{$>$}}} &{\symb{{$+$}}} \\
 {\symb{{$-$}}} &{\symb{*}} &{\symb{/}} \\
-{\symb{{$+$}{$=$}}} &{\symb{{$-$}{$=$}}} &{\symb{*{$=$}}} \\
-{\symb{/{$=$}}} &{\symb{{$+$}{$+$}}} &{\symb{{$-$}{$-$}}} \\
+{\symb{[}} &{\symb{]}} &{\symb{{$+$}{$=$}}} \\
+{\symb{{$-$}{$=$}}} &{\symb{*{$=$}}} &{\symb{/{$=$}}} \\
+{\symb{{$+$}{$+$}}} &{\symb{{$-$}{$-$}}} & \\
 \end{tabular}\\
 
 \subsection*{Comments}
@@ -222,6 +223,7 @@ All other symbols are terminals.\\
 
 \begin{tabular}{lll}
 {\nonterminal{Identifier}} & {\arrow}  &{\nonterminal{Ident}}  \\
+ & {\delimit}  &{\nonterminal{Ident}} {\terminal{[}} {\nonterminal{Integer}} {\terminal{]}}  \\
 \end{tabular}\\
 
 \begin{tabular}{lll}

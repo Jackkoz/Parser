@@ -93,6 +93,7 @@ data Type =
 
 data Identifier =
    Id Ident
+ | Arr Ident Integer
   deriving (Eq,Ord,Show)
 
 data ArAssign =

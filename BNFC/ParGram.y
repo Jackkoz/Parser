@@ -37,29 +37,31 @@ import ErrM
  '==' { PT _ (TS _ 20) }
  '>' { PT _ (TS _ 21) }
  '?' { PT _ (TS _ 22) }
- 'as' { PT _ (TS _ 23) }
- 'bool' { PT _ (TS _ 24) }
- 'const' { PT _ (TS _ 25) }
- 'do' { PT _ (TS _ 26) }
- 'else' { PT _ (TS _ 27) }
- 'else if (' { PT _ (TS _ 28) }
- 'execute' { PT _ (TS _ 29) }
- 'false' { PT _ (TS _ 30) }
- 'from' { PT _ (TS _ 31) }
- 'function' { PT _ (TS _ 32) }
- 'guard' { PT _ (TS _ 33) }
- 'if (' { PT _ (TS _ 34) }
- 'in' { PT _ (TS _ 35) }
- 'int' { PT _ (TS _ 36) }
- 'main' { PT _ (TS _ 37) }
- 'print' { PT _ (TS _ 38) }
- 'return' { PT _ (TS _ 39) }
- 'to' { PT _ (TS _ 40) }
- 'true' { PT _ (TS _ 41) }
- 'while' { PT _ (TS _ 42) }
- '{' { PT _ (TS _ 43) }
- '||' { PT _ (TS _ 44) }
- '}' { PT _ (TS _ 45) }
+ '[' { PT _ (TS _ 23) }
+ ']' { PT _ (TS _ 24) }
+ 'as' { PT _ (TS _ 25) }
+ 'bool' { PT _ (TS _ 26) }
+ 'const' { PT _ (TS _ 27) }
+ 'do' { PT _ (TS _ 28) }
+ 'else' { PT _ (TS _ 29) }
+ 'else if (' { PT _ (TS _ 30) }
+ 'execute' { PT _ (TS _ 31) }
+ 'false' { PT _ (TS _ 32) }
+ 'from' { PT _ (TS _ 33) }
+ 'function' { PT _ (TS _ 34) }
+ 'guard' { PT _ (TS _ 35) }
+ 'if (' { PT _ (TS _ 36) }
+ 'in' { PT _ (TS _ 37) }
+ 'int' { PT _ (TS _ 38) }
+ 'main' { PT _ (TS _ 39) }
+ 'print' { PT _ (TS _ 40) }
+ 'return' { PT _ (TS _ 41) }
+ 'to' { PT _ (TS _ 42) }
+ 'true' { PT _ (TS _ 43) }
+ 'while' { PT _ (TS _ 44) }
+ '{' { PT _ (TS _ 45) }
+ '||' { PT _ (TS _ 46) }
+ '}' { PT _ (TS _ 47) }
 
 L_quoted { PT _ (TL $$) }
 L_integ  { PT _ (TI $$) }
@@ -219,6 +221,7 @@ Type : 'int' { TInt }
 
 Identifier :: { Identifier }
 Identifier : Ident { Id $1 } 
+  | Ident '[' Integer ']' { Arr $1 $3 }
 
 
 ListIdentifier :: { [Identifier] }

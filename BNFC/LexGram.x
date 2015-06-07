@@ -18,7 +18,7 @@ $i = [$l $d _ ']          -- identifier character
 $u = [\0-\255]          -- universal: any character
 
 @rsyms =    -- symbols and non-identifier-like reserved words
-   \{ | \} | \; | \= | \( | \) | \: | \& | \, | "if" \  \( | "else" \  "if" \  \( | \? | \| \| | \& \& | \= \= | \< | \> | \+ | \- | \* | \/ | \+ \= | \- \= | \* \= | \/ \= | \+ \+ | \- \-
+   \{ | \} | \; | \= | \( | \) | \: | \& | \, | "if" \  \( | "else" \  "if" \  \( | \? | \| \| | \& \& | \= \= | \< | \> | \+ | \- | \* | \/ | \[ | \] | \+ \= | \- \= | \* \= | \/ \= | \+ \+ | \- \-
 
 :-
 "#" [.]* ; -- Toss single line comments
@@ -80,7 +80,7 @@ eitherResIdent tv s = treeFind resWords
                               | s > a  = treeFind right
                               | s == a = t
 
-resWords = b "as" 23 (b "--" 12 (b "*=" 6 (b "(" 3 (b "&&" 2 (b "&" 1 N N) N) (b "*" 5 (b ")" 4 N N) N)) (b "+=" 9 (b "++" 8 (b "+" 7 N N) N) (b "-" 11 (b "," 10 N N) N))) (b "<" 18 (b "/=" 15 (b "/" 14 (b "-=" 13 N N) N) (b ";" 17 (b ":" 16 N N) N)) (b ">" 21 (b "==" 20 (b "=" 19 N N) N) (b "?" 22 N N)))) (b "in" 35 (b "execute" 29 (b "do" 26 (b "const" 25 (b "bool" 24 N N) N) (b "else if (" 28 (b "else" 27 N N) N)) (b "function" 32 (b "from" 31 (b "false" 30 N N) N) (b "if (" 34 (b "guard" 33 N N) N))) (b "true" 41 (b "print" 38 (b "main" 37 (b "int" 36 N N) N) (b "to" 40 (b "return" 39 N N) N)) (b "||" 44 (b "{" 43 (b "while" 42 N N) N) (b "}" 45 N N))))
+resWords = b "]" 24 (b "--" 12 (b "*=" 6 (b "(" 3 (b "&&" 2 (b "&" 1 N N) N) (b "*" 5 (b ")" 4 N N) N)) (b "+=" 9 (b "++" 8 (b "+" 7 N N) N) (b "-" 11 (b "," 10 N N) N))) (b "<" 18 (b "/=" 15 (b "/" 14 (b "-=" 13 N N) N) (b ";" 17 (b ":" 16 N N) N)) (b ">" 21 (b "==" 20 (b "=" 19 N N) N) (b "[" 23 (b "?" 22 N N) N)))) (b "if (" 36 (b "else if (" 30 (b "const" 27 (b "bool" 26 (b "as" 25 N N) N) (b "else" 29 (b "do" 28 N N) N)) (b "from" 33 (b "false" 32 (b "execute" 31 N N) N) (b "guard" 35 (b "function" 34 N N) N))) (b "to" 42 (b "main" 39 (b "int" 38 (b "in" 37 N N) N) (b "return" 41 (b "print" 40 N N) N)) (b "{" 45 (b "while" 44 (b "true" 43 N N) N) (b "}" 47 (b "||" 46 N N) N))))
    where b s n = let bs = id s
                   in B bs (TS bs n)
 
