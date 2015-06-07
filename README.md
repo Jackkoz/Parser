@@ -4,13 +4,21 @@
 # Parser
 JIPP 2015 - Parser
 
-Język prezentuje składnię zbliżoną do C++/Javy 'prawie' zgodną z prezentowaną wcześniej
-gramatyką. Obecnie brakuje implementacji dla sensownej widoczności zmiennych, co owocuje
-brakiem funkcji i fora. Niemniej jednak mamy wsparcie dla:
-- Zmiennych (z przesłanianiem identyfikatorów w blokach)
-- Arytmetyki
-- Arytmetyki boolowskiej (w interpretacji liczbowej, false == 0, true != 0)
-- If + While
+Język prezentuje składnię zbliżoną do C++/Javy. Oferuje wsparcie dla:
+- Zmiennych oraz stałych
+- Arytmetyki liczbowej oraz boolowskiej (z leniwym wyliczaniem)
+- Kontroli typowania
+- Operacji rzutowania
+- If + While + For
+- Blok guard, który na czas wykonania zamienia zmienne na stałe
 - Wyrażenia ternarne (x = bexp ? exp : elseExp)
-- print (wypisywanie wyrażeń na standardowe wyjście)
+- Operacja print pozwalająca na wypisywanie wyrażeń lub napisów na ekran
 - Dodatkowe operatory przypisania: ++ i -- oraz += *= -= /=
+- Funkcje zwracające wartość
+- Przekazywanie przez referencję i przez wartość
+- Rekurencja
+- Funkcje anonimowe
+- Dowolne zagnieżdżanie funkcji
+- Przesłanianie identyfikatorów
+- Terminująca faza typowania przed uruchomieniem programu
+- Jawna obsługa dynamicznych błędów wykonania

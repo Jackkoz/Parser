@@ -79,18 +79,4 @@ main
     print(5);
     print(-5);
     print(-factorial(5) + 1);
-
-    print("Tablice");
-    # Wypisywanie rozmiaru
-    print(tab);
-    tab[1] = 5;
-    print(tab[1]);
-    from 1 to 10 as loop do
-    {
-        tab[loop] = factorial(loop);
-    }
-    from 4 to 7 as loop do
-    {
-        print(tab[loop - 1]);
-    }
 }
