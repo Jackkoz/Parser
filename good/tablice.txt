@@ -1,32 +1,75 @@
-# Plik z przyk�adowymi operacjami na tablicach
+# Plik z przykladowymi operacjami na tablicach
+
+function min (int x, int y) : int
+{
+    return x > y ? y : x;
+}
 
 function square (int x) : int
 {
     return x*x;
 }
 
+# Silnia rekurencyjna
+function factorial (int x) : int
+{
+    if (x > 1)
+    {
+        x = x * factorial(x - 1);
+    }
+    else
+    {
+        x = 1;
+    }
+    return x;
+}
+
 main
 {
     int tab[10];
     bool btab[15];
-    int end;
+    int tab2[10];
 
+    # Ustawienie zmiennych tab na kwadraty
+    # tab2 na silnie liczb w ich indeksach
     from 1 to tab as i do
     {
         tab[i] = square(i);
+        tab2[i] = i;
+        factorial(&tab2[i]);
     }
+
+    # Zabawy pętlą i rzutowaniem
     from -5 to btab-6 as i do
     {
         btab[i+6] = (i as bool);
     }
-    print(tab);
-    print(btab);
-    end = tab < btab ? tab : btab;
-    from 1 to end as i do
+
+    from 1 to min(tab,btab) as i do
     {
         print(tab[i]);
         print(btab[i]);
         print(tab[i] * (btab[i] as int));
-        tab[i] = btab[i];
+    }
+
+    # Pętla porównująca wartości kwadratów i silni
+    # pierwszych 10 liczb naturalnych
+    from 1 to tab as i do
+    {
+        if (tab[i] > tab2[i])
+        {
+            print("Square");
+            print(tab[i]);
+        }
+        else if (tab[i] < tab2[i])
+        {
+            print("Factorial");
+            print(tab2[i]);
+        }
+        else
+        {
+            print("Equal");
+            print(tab[i]);
+        }
     }
 }
