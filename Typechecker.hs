@@ -353,8 +353,6 @@ evalFuncDecl (FDec id args rtype rblock) = do
     modify (M.insert newLoc (Func env' rtype args rblock))
     env'' <- createEnv env' args
     local (const env'') (eval (Anon rtype rblock))
---    val <- local (const env) (evalRetBlock (SRBlock d fd st exp))
---    case rtype
     return env'
     where
     checkArgs (Args t id) = checkRedeclared(id)
