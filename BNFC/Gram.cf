@@ -79,7 +79,7 @@ TInt.           Type            ::=     "int" ;
 TBool.          Type            ::=     "bool" ;
 
 Id.             Identifier      ::=     Ident ;
-Arr.            Identifier      ::=     Ident "[" Integer "]" ;
+Arr.            Identifier      ::=     Ident "[" Exp "]" ;
 
 separator nonempty Identifier  "," ;
 
