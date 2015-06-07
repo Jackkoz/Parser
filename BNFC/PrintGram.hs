@@ -207,7 +207,7 @@ instance Print Type where
 instance Print Identifier where
   prt i e = case e of
    Id id -> prPrec i 0 (concatD [prt 0 id])
-   Arr id n -> prPrec i 0 (concatD [prt 0 id , doc (showString "[") , prt 0 n , doc (showString "]")])
+   Arr id exp -> prPrec i 0 (concatD [prt 0 id , doc (showString "[") , prt 0 exp , doc (showString "]")])
 
   prtList es = case es of
    [x] -> (concatD [prt 0 x])

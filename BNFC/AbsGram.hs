@@ -93,7 +93,7 @@ data Type =
 
 data Identifier =
    Id Ident
- | Arr Ident Integer
+ | Arr Ident Exp
   deriving (Eq,Ord,Show)
 
 data ArAssign =

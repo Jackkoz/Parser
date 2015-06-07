@@ -221,7 +221,7 @@ Type : 'int' { TInt }
 
 Identifier :: { Identifier }
 Identifier : Ident { Id $1 } 
-  | Ident '[' Integer ']' { Arr $1 $3 }
+  | Ident '[' Exp ']' { Arr $1 $3 }
 
 
 ListIdentifier :: { [Identifier] }
