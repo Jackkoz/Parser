@@ -1,0 +1,32 @@
+# Plik z przyk³adowymi operacjami na tablicach
+
+function square (int x) : int
+{
+    return x*x;
+}
+
+main
+{
+    int tab[10];
+    bool btab[15];
+    int end;
+
+    from 1 to tab as i do
+    {
+        tab[i] = square(i);
+    }
+    from -5 to btab-6 as i do
+    {
+        btab[i+6] = (i as bool);
+    }
+    print(tab);
+    print(btab);
+    end = tab < btab ? tab : btab;
+    from 1 to end as i do
+    {
+        print(tab[i]);
+        print(btab[i]);
+        print(tab[i] * (btab[i] as int));
+        tab[i] = btab[i];
+    }
+}

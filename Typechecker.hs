@@ -21,6 +21,7 @@ typeCheck p = do
 
 data Val = IVal Integer | CVal Integer
     | VBool Bool | CBool Bool
+    | Tab Integer
     | Func Env Type [Arguments] RBlock
     deriving (Eq, Ord, Show)
 
@@ -38,16 +39,31 @@ type Semantics a = ReaderT Env (StateT St IO) a
 
 evalId :: Identifier -> String
 evalId (Id id) = evalIdent id
+evalId (Arr id size) = evalIdent id
 
 evalIdent :: Ident -> String
 evalIdent (Ident str) = str
 
 takeLocation :: Identifier -> Semantics Loc
-takeLocation id = do
-    loc <- asks (M.lookup (evalId id))
+takeLocation (Id id) = do
+    loc <- asks (M.lookup (evalIdent id))
     case loc of
         Just loc -> return loc
-        Nothing  -> error ("Identyfikator nie został zadeklarowany: " ++ (evalId id))
+        Nothing  -> error ("Niezadeklarowana zmienna: " ++ (evalIdent id))
+
+takeLocation (Arr id s) = do
+    s' <- eval s
+    case s' of
+        IVal s' -> return ()
+        CVal s' -> return ()
+        _ -> error("Indeks tablicy " ++ evalIdent(id) ++ "musi być typu Int: " ++ show(s))
+    arrLoc <- asks (M.lookup (evalIdent id))
+    case arrLoc of
+        Nothing ->
+            error ("Niezadeklarowana zmienna tablicowa: " ++ (evalIdent id))
+        Just arrLoc -> do
+            -- Wszystkie zmienne tablicowe są tego samego typu
+            return (arrLoc + 1)
 
 takeValue :: Loc -> Semantics Val
 takeValue loc = do
@@ -102,7 +118,7 @@ eval (Eand  exp1 exp2) = do
 eval (Eeq  exp1 exp2) = do
     val1 <- eval exp1
     val2 <- eval exp2
-    if (not $ (isInt val1 && isInt val2) || (isBool val1 && isBool val2)) then
+    if (not $ ((isInt val1 && isInt val2) || (isBool val1 && isBool val2))) then
         error("Wyrażenia mają niezgodne typy: " ++ show(exp1) ++ " oraz " ++ show(exp2))
     else return (VBool True)
 
@@ -166,11 +182,15 @@ eval (Call id vals) = do
         modify (M.insert 0 (IVal (newLoc+1)))
         env' <- (return $ M.insert (evalId(idd)) newLoc env)
         createEnv env' args vals
+    createEnv _ v [] =
+        error("Niepoprawna liczba argumentów w wywołaniu funkcji " ++ evalId id)
+    createEnv _ [] v =
+            error("Niepoprawna liczba argumentów w wywołaniu funkcji " ++ evalId id)
 
     createEnv env (Args ttype idd:args) (Ref ref:vals) = do
         val' <- getVal(ref)
         case ttype of
-            TInt -> if (not $ isInt val') then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
+            TInt -> if (not $ isInt val')   then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
                 else return ()
             TBool -> if (not $ isBool val') then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
                 else return ()
@@ -218,20 +238,18 @@ interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
     checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
     val2 <- getVal(id)
     if ((isInt val && isInt val2) || (isBool val && isBool val2))
     then
-        modify (M.insert loc val)
+        return ()
     else
         error("Niezgodność typów przy przypisaniu " ++ show(exp) ++ " na " ++ evalId(id))
 
 interpretA (AArith id AAPlus exp) = do
     checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     val1 <- evalE exp
     if (not $ isInt val1) then
         error("Wyrażenie nie jest wyrażeniem arytmetycznym: " ++ show exp)
@@ -240,8 +258,8 @@ interpretA (AArith id AAPlus exp) = do
     Just val2 <- gets (M.lookup loc)
     if (not $ isInt val2) then
         error("Zły typ zmiennej dla przypisania arytmetycznego: " ++ evalId id)
-    else return ()
-    modify (M.insert loc val1)
+    else
+        return ()
 
 interpretA (AArith id AAMinus exp) = do
     interpretA (AArith id AAPlus exp)
@@ -255,13 +273,12 @@ interpretA (AArith id AADiv exp) = do
 interpretA (AIncDec id Increment) = do
     checkIsDeclared(id)
     checkIsNotConst(id)
-    checkIsVar(id)
     Just loc <-asks (M.lookup (evalId id))
     Just val <- gets (M.lookup loc)
     if (not $ isInt val) then
         error("Zły typ zmiennej dla przypisania arytmetycznego: " ++ evalId id)
-    else return ()
-    modify (M.insert loc val)
+    else
+        return ()
 
 interpretA (AIncDec id Decrement) = do
     interpretA(AIncDec id Increment)
@@ -271,6 +288,8 @@ interpretA (AIncDec id Decrement) = do
 -- DECLARATIONS
 
 evalDecl :: Decl -> Semantics Env
+evalDecl (DAssign t (Arr id s) expr) = do
+    error("Błędna deklaracja tablicy " ++ evalIdent id)
 evalDecl (DAssign t id expr) = do
     checkRedeclared id
     val <- evalE expr
@@ -285,17 +304,62 @@ evalDecl (DAssign t id expr) = do
     env <- ask
     return $ M.insert (evalId(id)) newLoc env
 
-evalDecl (Declr t id) = do
-    loc <-asks (M.lookup (evalId id))
+evalDecl (Declr t (Id id)) = do
+    loc <-asks (M.lookup (evalIdent id))
     case loc of
         Nothing -> do
             Just (IVal newLoc) <- gets (M.lookup 0)
             -- initialize to 0
-            modify (M.insert newLoc (IVal 0))
+            case t of
+                TInt ->
+                    modify (M.insert newLoc (IVal 0))
+                TBool ->
+                    modify (M.insert newLoc (VBool False))
             modify (M.insert 0 (IVal (newLoc+1)))
             env <- ask
-            return $ M.insert (evalId(id)) newLoc env
-        _ -> error("Identyfikator jest już w użyciu: " ++ evalId(id))
+            return $ M.insert (evalIdent(id)) newLoc env
+        _ ->
+            error("Identyfikator jest już w użyciu: " ++ evalIdent(id))
+evalDecl (Declr t (Arr id s)) = do
+    loc <-asks (M.lookup (evalIdent id))
+    case loc of
+        Nothing ->
+            return ()
+        Just _  ->
+            error("Identyfikator jest już w użyciu: " ++ evalIdent(id))
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    s <- eval s
+    if (not $ isInt s) then
+        error("Rozmiar tablicy " ++ evalIdent(id) ++ " musi być typu Int: " ++ show s)
+    else
+        return()
+    case s of
+        CVal size -> do declare t id newLoc size
+        IVal size -> do declare t id newLoc size
+
+    where
+    declare t id newLoc size = do
+        if (size < 1) then
+            error ("Rozmiar deklarowanej tablicy musi być liczbą naturalną: " ++ evalIdent(id))
+        else return ()
+        modify (M.insert newLoc (Tab size))
+        modify (M.insert 0 (IVal (newLoc+1)))
+        createVars t size
+        env <- ask
+        return $ M.insert (evalIdent(id)) newLoc env
+    createVars _ 0 = return ()
+    createVars ttype number = do
+        Just (IVal newLoc) <- gets (M.lookup 0)
+        case ttype of
+            TInt ->
+                modify (M.insert newLoc (IVal 0))
+            TBool ->
+                modify (M.insert newLoc (VBool False))
+        modify (M.insert 0 (IVal (newLoc+1)))
+        createVars ttype (number - 1)
+
+evalDecl (DConstDec t (Arr id s) expr) = do
+    error("Błędna deklaracja tablicy " ++ evalIdent id)
 evalDecl (DConstDec t id expr) = do
     loc <-asks (M.lookup (evalId id))
     case loc of
@@ -408,7 +472,6 @@ interpret this@(SWhile exp block) = do
     else return ()
     interpretB block
 
-
 interpret (Sprint Etrue) = do
     return ()
 interpret (Sprint Efalse) = do
@@ -495,6 +558,8 @@ checkIsNotConst (id) = do
                     return ()
                 Just (VBool val) ->
                     return ()
+                Just (Tab _) ->
+                    return ()
                 _ -> do
                     error("Nielegalna próba przypisania do funkcji " ++ (evalId id))
         Nothing -> return ()
@@ -518,6 +583,8 @@ checkIsVar (id) = do
             case val of
                 Just (Func _ _ _ _) -> do
                     error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
+--                Just (Tab _) -> do
+--                    error("Identyfikator zmiennej jest przypisany do tablicy: " ++ evalId(id))
                 _ -> do
                     return ()
 
@@ -537,9 +604,20 @@ checkIsDeclared (id) = do
         Nothing -> do
             error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
 
+checkIsNotArray (id) = do
+    loc <- takeLocation id
+    case id of
+        Id id -> do
+            val <- takeValue loc
+            case val of
+                Tab _ -> error("Nielegalna próba przypisania na nagłówek tablicy " ++ evalIdent(id))
+                _ -> return ()
+        _ -> return ()
+
 isInt :: Val -> Bool
 isInt (CVal _) = True
 isInt (IVal _) = True
+isInt (Tab _)  = True
 isInt _ = False
 
 isBool :: Val -> Bool

@@ -4,7 +4,6 @@ import Data.Map as M
 import Control.Monad.Reader
 import Control.Monad.State
 
-import Types
 import AbsGram
 
 interpretP :: Program -> Semantics ()
@@ -17,6 +16,68 @@ execProgram :: Program -> IO ()
 execProgram p = do
     finalState <- execStateT (runReaderT (interpretP p) emptyEnv) initialSt
     return ()
+
+-- TYPES
+
+data Val = IVal Integer | CVal Integer
+    | VBool Bool | CBool Bool
+    | Func Env Type [Arguments] RBlock
+    deriving (Eq, Ord, Show)
+
+type Loc = Integer
+type Env = M.Map String Loc
+type St  = M.Map Loc Val
+
+emptyEnv :: Env
+emptyEnv = M.empty
+
+initialSt :: St
+initialSt = M.singleton 0 (IVal 1)
+
+type Semantics a = ReaderT Env (StateT St IO) a
+
+evalId :: Identifier -> String
+evalId (Id id) = evalIdent id
+evalId (Arr id size) = evalIdent id
+
+evalIdent :: Ident -> String
+evalIdent (Ident str) = str
+
+takeLocation :: Identifier -> Semantics Loc
+takeLocation (Id id) = do
+    loc <- asks (M.lookup (evalIdent id))
+    case loc of
+        Just loc -> return loc
+        Nothing  -> error ("Niezadeklarowana zmienna: " ++ (evalIdent id))
+
+takeLocation (Arr id s) = do
+    s <- eval s
+    index <- getInt s
+    if (index < 1) then
+        error ("Indeks tablicy musi być liczbą naturalną: " ++ show index ++ " ; " ++ evalIdent id)
+    else do
+        arrLoc <- asks (M.lookup (evalIdent id))
+        case arrLoc of
+            Nothing ->
+                error ("Niezadeklarowana zmienna tablicowa: " ++ (evalIdent id))
+            Just arrLoc -> do
+                (CVal size) <- takeValue arrLoc
+                if (index > size) then
+                    error ("Indeks " ++ show index ++ " jest poza tablicą " ++ evalIdent id)
+                else
+                    return (arrLoc + index)
+
+takeValue :: Loc -> Semantics Val
+takeValue loc = do
+    Just val <- gets (M.lookup loc)
+    return val
+
+getVal :: Identifier -> Semantics Val
+getVal id = do
+    loc <- takeLocation id
+    takeValue loc
+
+-- *****
 
 -- EXPRESSIONS
 
@@ -39,7 +100,7 @@ eval :: Exp -> Semantics Val
 eval (EInt i) = return (IVal i)
 
 eval (EVar id) = do
-    Just loc <- asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just val <- gets (M.lookup loc)
     return val
 
@@ -90,8 +151,10 @@ eval (Elt  exp1 exp2) = do
         else return (VBool False)
 
 eval (EAdd exp1 exp2) = do
-    (IVal val1) <- eval exp1
-    (IVal val2) <- eval exp2
+    val1 <- eval exp1
+    val1 <- getInt val1
+    val2 <- eval exp2
+    val2 <- getInt val2
     return (IVal (val1 + val2))
 
 eval (ESub exp1 exp2) = do
@@ -163,13 +226,9 @@ eval (Call id vals) = do
 
     createEnv env (Args ttype id:args) (Ref ref:vals) = do
         Just (IVal newLoc) <- gets (M.lookup 0)
-        loc <-asks (M.lookup (evalId(ref)))
-        case loc of
-            Just loc -> do
-                env' <- (return $ M.insert (evalId(id)) loc env)
-                createEnv env' args vals
-            Nothing ->
-                error ("Identyfikator nie jest zadeklarowany: " ++ evalId(id))
+        loc <- takeLocation ref
+        env' <- (return $ M.insert (evalId(id)) loc env)
+        createEnv env' args vals
 
 eval (Anon ttype rblock) = do
     env <- ask
@@ -193,14 +252,14 @@ interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
     checkIsNotConst(id)
     val <- evalE exp
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     modify (M.insert loc val)
 
 interpretA (AArith id AAPlus exp) = do
     checkIsNotConst(id)
     val1 <- evalE exp
     val1 <- getInt val1
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 + val2)))
 
@@ -208,7 +267,7 @@ interpretA (AArith id AAMinus exp) = do
     checkIsNotConst(id)
     val1 <- evalE exp
     val1 <- getInt val1
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val2 - val1)))
 
@@ -216,7 +275,7 @@ interpretA (AArith id AAMulti exp) = do
     checkIsNotConst(id)
     val1 <- evalE exp
     val1 <- getInt val1
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val1 * val2)))
 
@@ -224,19 +283,19 @@ interpretA (AArith id AADiv exp) = do
     checkIsNotConst(id)
     val1 <- evalE exp
     val1 <- getInt val1
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val2) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (div val2  val1)))
 
 interpretA (AIncDec id Increment) = do
     checkIsNotConst(id)
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val + 1)))
 
 interpretA (AIncDec id Decrement) = do
     checkIsNotConst(id)
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (IVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal (val - 1)))
 
@@ -262,7 +321,7 @@ evalDecl (DAssign TBool id expr) = do
     env <- ask
     return $ M.insert (evalId(id)) newLoc env
 
-evalDecl (Declr t id) = do
+evalDecl (Declr t (Id id)) = do
     Just (IVal newLoc) <- gets (M.lookup 0)
     -- initialize to 0
     case t of
@@ -272,7 +331,31 @@ evalDecl (Declr t id) = do
             modify (M.insert newLoc (VBool False))
     modify (M.insert 0 (IVal (newLoc+1)))
     env <- ask
-    return $ M.insert (evalId(id)) newLoc env
+    return $ M.insert (evalIdent(id)) newLoc env
+evalDecl (Declr t (Arr id s)) = do
+    s <- eval s
+    size <- getInt s
+    if (size < 1) then
+        error ("Rozmiar deklarowanej tablicy musi być liczbą naturalną: " ++ evalIdent(id))
+    else return ()
+    Just (IVal newLoc) <- gets (M.lookup 0)
+    modify (M.insert newLoc (CVal size))
+    modify (M.insert 0 (IVal (newLoc+1)))
+    createVars t size
+    env <- ask
+    return $ M.insert (evalIdent(id)) newLoc env
+    where
+    createVars _ 0 = return ()
+    createVars ttype number = do
+        Just (IVal newLoc) <- gets (M.lookup 0)
+        case ttype of
+            TInt ->
+                modify (M.insert newLoc (IVal 0))
+            TBool ->
+                modify (M.insert newLoc (VBool False))
+        modify (M.insert 0 (IVal (newLoc+1)))
+        env <- ask
+        createVars ttype (number - 1)
 
 evalDecl (DConstDec TInt id expr) = do
     Just (IVal newLoc) <- gets (M.lookup 0)
@@ -300,7 +383,7 @@ evalDecls (decl:decls) = do
 redeclareConst :: Identifier -> Semantics ()
 redeclareConst id = do
     checkIsVar(id)
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just val <- gets (M.lookup loc)
     case val of
         IVal val -> do
@@ -310,14 +393,12 @@ redeclareConst id = do
 
 redeclareVar :: Identifier -> Semantics ()
 redeclareVar id = do
-    Just loc <-asks (M.lookup (evalId id))
+    loc <- takeLocation id
     Just (CVal val) <- gets (M.lookup loc)
     modify (M.insert loc (IVal val))
 
 evalFuncDecl :: FunctionDeclaration -> Semantics Env
 evalFuncDecl (FDec id args rtype rblock) = do
-    checkRedeclared(id)
-    mapM_ checkArgs args
     Just (IVal newLoc) <- gets (M.lookup 0)
 
     modify (M.insert 0 (IVal (newLoc+1)))
@@ -325,8 +406,6 @@ evalFuncDecl (FDec id args rtype rblock) = do
     env' <- return $ M.insert (evalId(id)) newLoc env
     modify (M.insert newLoc (Func env' rtype args rblock))
     return env'
-    where
-    checkArgs (Args t id) = checkRedeclared(id)
 
 evalFuncDecls :: [FunctionDeclaration] -> Semantics Env
 evalFuncDecls [] = ask
@@ -444,40 +523,24 @@ interpretB (SBlock decls fdecls stmts) = do
 -- CHECKS
 
 checkIsNotConst (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            val <- gets (M.lookup loc)
-            case val of
-                Just (CVal val) -> do
-                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
-                Just (CBool val) ->
-                    error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
-                _ -> do
-                    return ()
-        Nothing -> return ()
-
-checkIsFunction (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            val <- gets (M.lookup loc)
-            case val of
-                Just (Func _ _ _ _) -> do
-                    return ()
-                _ -> do
-                    error("Identyfikator wywołania nie jest przypisany do funkcji: " ++ evalId(id))
+    loc <- takeLocation id
+    val <- gets (M.lookup loc)
+    case val of
+        Just (CVal val) -> do
+            error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
+        Just (CBool val) ->
+            error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
+        _ -> do
+            return ()
 
 checkIsVar (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            val <- gets (M.lookup loc)
-            case val of
-                Just (Func _ _ _ _) -> do
-                    error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
-                _ -> do
-                    return ()
+    loc <- takeLocation id
+    val <- gets (M.lookup loc)
+    case val of
+        Just (Func _ _ _ _) -> do
+            error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
+        _ -> do
+            return ()
 
 checkRedeclared (id) = do
     loc <-asks (M.lookup (evalId id))
@@ -486,15 +549,6 @@ checkRedeclared (id) = do
             error("Identyfikator jest już w użyciu: " ++ (evalId(id)))
         Nothing ->
             return ()
-
-checkIsDeclared (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc ->
-            return ()
-        Nothing -> do
-            error("Identyfikator nie był zadeklarowany: " ++ (evalId(id)))
-
 -- *****
 
 getInt v = do

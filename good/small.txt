@@ -1,5 +1,5 @@
 # Deklaracja zmiennej globalnej
-const int test = 0;
+const int test = 8;
 
 # Prosta funkcja operuj¹ca na dwóch argumentach i przes³oniêtym
 # y (z punktu widzenia bloku main)
@@ -21,7 +21,8 @@ function inc (int x) : int {
     return x;
 }
 
-function dec (int x) : int {
+function dec (int x) : int
+{
     x--;
     return x;
 }
@@ -32,6 +33,8 @@ main
     int x = 5;
     #bool y = 5;
     bool y = false;
+    int tab[10];
+    print(test);
     #bool y;
     x++;
     x--;
@@ -69,14 +72,25 @@ main
     # x to nadal 6, oczekujemy faszu na konsoli
     if (x > 2 && x < 4)
         {print("Error");}
-    else
-    {
-
-    }
+    else {}
 
     print(true);
     print(-(true && false));
     print(5);
     print(-5);
     print(-factorial(5) + 1);
+
+    print("Tablice");
+    # Wypisywanie rozmiaru
+    print(tab);
+    tab[1] = 5;
+    print(tab[1]);
+    from 1 to 10 as loop do
+    {
+        tab[loop] = factorial(loop);
+    }
+    from 4 to 7 as loop do
+    {
+        print(tab[loop - 1]);
+    }
 }
