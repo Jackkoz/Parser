@@ -253,7 +253,16 @@ interpretA (Assign id exp) = do
     checkIsNotConst(id)
     val <- evalE exp
     loc <- takeLocation id
-    modify (M.insert loc val)
+    case val of
+        IVal val ->
+            modify (M.insert loc (IVal val))
+        CVal val ->
+            modify (M.insert loc (IVal val))
+        VBool val ->
+            modify (M.insert loc (VBool val))
+        CBool val ->
+            modify (M.insert loc (VBool val))
+
 
 interpretA (AArith id AAPlus exp) = do
     checkIsNotConst(id)
