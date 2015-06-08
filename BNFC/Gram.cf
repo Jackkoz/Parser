@@ -92,3 +92,4 @@ Increment.      IncDec          ::=     "++" ;
 Decrement.      IncDec          ::=     "--" ;
 
 comment "#" ;
+comment "/*" "*/" ;
