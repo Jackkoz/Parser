@@ -189,19 +189,22 @@ eval (Call id vals) = do
 
     createEnv env (Args ttype idd:args) (Ref ref:vals) = do
         val' <- getVal(ref)
-        case ttype of
-            TInt -> if (not $ isInt val')   then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
-                else return ()
-            TBool -> if (not $ isBool val') then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
-                else return ()
-        Just (IVal newLoc) <- gets (M.lookup 0)
-        loc <-asks (M.lookup (evalId(ref)))
-        case loc of
-            Just loc -> do
-                env' <- (return $ M.insert (evalId(idd)) loc env)
-                createEnv env' args vals
-            Nothing ->
-                error ("Identyfikator nie jest zadeklarowany: " ++ evalId(idd))
+        case val' of
+            Tab _ -> error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
+            _ -> do
+                case ttype of
+                    TInt -> if (not $ isInt val')   then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
+                        else return ()
+                    TBool -> if (not $ isBool val') then error("Błędny typ dla argumentu " ++ show(idd) ++ " przy wywołaniu funkcji " ++ evalId(id))
+                        else return ()
+                Just (IVal newLoc) <- gets (M.lookup 0)
+                loc <-asks (M.lookup (evalId(ref)))
+                case loc of
+                    Just loc -> do
+                        env' <- (return $ M.insert (evalId(idd)) loc env)
+                        createEnv env' args vals
+                    Nothing ->
+                        error ("Identyfikator nie jest zadeklarowany: " ++ evalId(idd))
 
 eval (Anon TBool (SRBlock d fd st exp)) = do
     env <- ask
