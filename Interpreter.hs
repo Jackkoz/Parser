@@ -48,7 +48,6 @@ takeLocation (Id id) = do
     loc <- asks (M.lookup (evalIdent id))
     case loc of
         Just loc -> return loc
-        Nothing  -> error ("Niezadeklarowana zmienna: " ++ (evalIdent id))
 
 takeLocation (Arr id s) = do
     s <- eval s
@@ -58,8 +57,6 @@ takeLocation (Arr id s) = do
     else do
         arrLoc <- asks (M.lookup (evalIdent id))
         case arrLoc of
-            Nothing ->
-                error ("Niezadeklarowana zmienna tablicowa: " ++ (evalIdent id))
             Just arrLoc -> do
                 (CVal size) <- takeValue arrLoc
                 if (index > size) then
@@ -212,7 +209,6 @@ eval (Call id vals) = do
         Func env rtype args rblock -> do
             env' <- createEnv env args vals
             local (const env') (evalRetBlock rblock)
-        _ -> error("Identifier does not match a function: " ++ evalId(id))
 
     where
     createEnv env [] [] = return env
@@ -549,14 +545,6 @@ checkIsVar (id) = do
         Just (Func _ _ _ _) -> do
             error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
         _ -> do
-            return ()
-
-checkRedeclared (id) = do
-    loc <-asks (M.lookup (evalId id))
-    case loc of
-        Just loc -> do
-            error("Identyfikator jest już w użyciu: " ++ (evalId(id)))
-        Nothing ->
             return ()
 -- *****
 
