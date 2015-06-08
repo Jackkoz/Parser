@@ -583,8 +583,6 @@ checkIsVar (id) = do
             case val of
                 Just (Func _ _ _ _) -> do
                     error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
---                Just (Tab _) -> do
---                    error("Identyfikator zmiennej jest przypisany do tablicy: " ++ evalId(id))
                 _ -> do
                     return ()
 
