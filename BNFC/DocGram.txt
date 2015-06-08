@@ -48,7 +48,7 @@ The symbols used in Gram are the following:
   | -- |  |  | 
 
 ===Comments===
-Single-line comments begin with #.There are no multiple-line comments in the grammar.
+Single-line comments begin with #.Multiple-line comments are  enclosed with /* and */.
 
 ==The syntactic structure of Gram==
 Non-terminals are enclosed between < and >. 
