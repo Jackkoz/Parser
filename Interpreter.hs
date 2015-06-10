@@ -389,18 +389,26 @@ redeclareConst :: Identifier -> Semantics ()
 redeclareConst id = do
     checkIsVar(id)
     loc <- takeLocation id
-    Just val <- gets (M.lookup loc)
+    val <- getVal id
     case val of
         IVal val -> do
             modify (M.insert loc (CVal val))
         CVal val -> do
             error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
+        VBool val -> do
+            modify (M.insert loc (CBool val))
+        CBool val -> do
+            error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
 
 redeclareVar :: Identifier -> Semantics ()
 redeclareVar id = do
     loc <- takeLocation id
-    Just (CVal val) <- gets (M.lookup loc)
-    modify (M.insert loc (IVal val))
+    val <- getVal id
+    case val of
+        CVal val ->
+            modify (M.insert loc (IVal val))
+        CBool val ->
+            modify (M.insert loc (VBool val))
 
 evalFuncDecl :: FunctionDeclaration -> Semantics Env
 evalFuncDecl (FDec id args rtype rblock) = do
@@ -465,9 +473,12 @@ interpret (SprintS s) = do
     liftIO $ print s
 
 interpret (SGuard ids block) = do
-    makeConst ids
+    env <- makeConst ids
     interpretB block
-    makeVar ids
+    env <- makeVar ids
+    return ()
+--    interpretB block
+--    makeVar ids
     where
     makeConst ids = do
         mapM_ redeclareConst ids
@@ -529,20 +540,20 @@ interpretB (SBlock decls fdecls stmts) = do
 
 checkIsNotConst (id) = do
     loc <- takeLocation id
-    val <- gets (M.lookup loc)
+    val <- getVal id
     case val of
-        Just (CVal val) -> do
+        (CVal val) -> do
             error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
-        Just (CBool val) ->
+        (CBool val) ->
             error ("Nielegalna próba przypisania do stałej " ++ (evalId id))
         _ -> do
             return ()
 
 checkIsVar (id) = do
     loc <- takeLocation id
-    val <- gets (M.lookup loc)
+    val <- getVal id
     case val of
-        Just (Func _ _ _ _) -> do
+        (Func _ _ _ _) -> do
             error("Identyfikator zmiennej jest przypisany do funkcji: " ++ evalId(id))
         _ -> do
             return ()

@@ -185,7 +185,7 @@ eval (Call id vals) = do
     createEnv _ v [] =
         error("Niepoprawna liczba argumentów w wywołaniu funkcji " ++ evalId id)
     createEnv _ [] v =
-            error("Niepoprawna liczba argumentów w wywołaniu funkcji " ++ evalId id)
+        error("Niepoprawna liczba argumentów w wywołaniu funkcji " ++ evalId id)
 
     createEnv env (Args ttype idd:args) (Ref ref:vals) = do
         val' <- getVal(ref)
@@ -240,6 +240,7 @@ evalRetBlock (SRBlock decls fdecls stmts exp) = do
 interpretA :: Assignment -> Semantics ()
 interpretA (Assign id exp) = do
     checkIsDeclared(id)
+    checkIsNotArray(id)
     checkIsNotConst(id)
     val <- evalE exp
     Just loc <-asks (M.lookup (evalId id))
@@ -252,6 +253,7 @@ interpretA (Assign id exp) = do
 
 interpretA (AArith id AAPlus exp) = do
     checkIsDeclared(id)
+    checkIsNotArray(id)
     checkIsNotConst(id)
     val1 <- evalE exp
     if (not $ isInt val1) then
@@ -275,6 +277,7 @@ interpretA (AArith id AADiv exp) = do
 
 interpretA (AIncDec id Increment) = do
     checkIsDeclared(id)
+    checkIsNotArray(id)
     checkIsNotConst(id)
     Just loc <-asks (M.lookup (evalId id))
     Just val <- gets (M.lookup loc)
@@ -373,12 +376,21 @@ evalDecl (DConstDec t id expr) = do
                 TInt -> do
                     if (not (isInt val)) then
                         error("Zły typ przypisania wyrażenia " ++ show(expr) ++ " na zmienną " ++ evalId(id))
-                    else return ()
+                    else
+                        case val of
+                            IVal val ->
+                                modify (M.insert newLoc (CVal val))
+                            CVal val ->
+                                modify (M.insert newLoc (CVal val))
                 TBool ->
                     if (not (isBool val)) then
                         error("Zły typ przypisania wyrażenia " ++ show(expr) ++ " na zmienną " ++ evalId(id))
-                    else return ()
-            modify (M.insert newLoc val)
+                    else
+                        case val of
+                            VBool val ->
+                                modify (M.insert newLoc (CBool val))
+                            CBool val ->
+                                modify (M.insert newLoc (CBool val))
             modify (M.insert 0 (IVal (newLoc+1)))
             env <- ask
             return $ M.insert (evalId(id)) newLoc env
@@ -394,19 +406,28 @@ evalDecls (decl:decls) = do
 redeclareConst :: Identifier -> Semantics ()
 redeclareConst id = do
     checkIsVar(id)
-    Just loc <-asks (M.lookup (evalId id))
-    Just val <- gets (M.lookup loc)
+    loc <- takeLocation id
+    val <- getVal id
     case val of
         IVal val -> do
             modify (M.insert loc (CVal val))
         CVal val -> do
             error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
-
+        VBool val -> do
+            modify (M.insert loc (CBool val))
+        CBool val ->
+            error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
+        Tab val ->
+            error ("Niepoprawny parametr dla guard, identyfikator jest nagłówkiem tablicy: " ++ evalId(id))
 redeclareVar :: Identifier -> Semantics ()
 redeclareVar id = do
-    Just loc <-asks (M.lookup (evalId id))
-    Just (CVal val) <- gets (M.lookup loc)
-    modify (M.insert loc (IVal val))
+    loc <- takeLocation id
+    val <- getVal id
+    case val of
+        CVal val ->
+            modify (M.insert loc (IVal val))
+        CBool val ->
+            modify (M.insert loc (VBool val))
 
 evalFuncDecl :: FunctionDeclaration -> Semantics Env
 evalFuncDecl (FDec id args rtype rblock) = do
