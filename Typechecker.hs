@@ -354,9 +354,9 @@ evalDecl (Declr t (Arr id s)) = do
     createVars ttype number = do
         Just (IVal newLoc) <- gets (M.lookup 0)
         case ttype of
-            TInt ->
+            TInt -> do
                 modify (M.insert newLoc (IVal 0))
-            TBool ->
+            TBool -> do
                 modify (M.insert newLoc (VBool False))
         modify (M.insert 0 (IVal (newLoc+1)))
         createVars ttype (number - 1)
