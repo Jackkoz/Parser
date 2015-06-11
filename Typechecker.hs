@@ -88,9 +88,11 @@ evalE (ExpTer bexp exp1 exp2) = do
     if (not $ isBool bvalue) then
         error("Wyrażenie nie jest boolowskie: " ++ show(bexp))
     else return ()
-    val <- eval exp2
-    val <- eval exp1
-    return val
+    val1 <- eval exp2
+    val2 <- eval exp1
+    if (not $ ((isInt val1 && isInt val2) || (isBool val1 && isBool val2))) then
+        error("Wyniki wyrażenia ternarnego mają niezgodne typy: " ++ show(exp1) ++ " oraz " ++ show(exp2))
+    return val1
 
 eval :: Exp -> Semantics Val
 eval (EInt i) = return (IVal 1)
