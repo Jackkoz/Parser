@@ -1,0 +1,71 @@
+int globalI;
+const int globalCI = 5;
+
+bool globalB;
+const bool globalTrue = true;
+const bool globalFalse = false;
+
+int tab[5];
+bool btab[5];
+
+main
+{
+
+    print(globalI);
+    print(globalCI);
+    print(globalB);
+    print(globalTrue);
+    print(globalFalse);
+
+    # Nielegalna próba nadpisania rozmiaru tablicy
+    # tab = 5;
+
+    # Nielegalna próba nadpisania sta³ej
+    # globalCI = 3;
+    # globalTrue = false;
+    # globalFalse = false;
+    # globalFalse = 5;
+
+    globalI = 10;
+    print(globalI*2);
+    # Z³e typy
+    # globalI = true;
+    # globalB = globalI;
+    # globalB = 5;
+    # tab[3] = false;
+    # btab[8] = 5;
+
+    tab[1] = 3;
+    tab[3] = tab[1];
+    guard (tab[tab[1]], btab[5]) in
+    {
+        print(tab[1]);
+        # W tym momencie tab[3] jest sta³¹
+        # tab[3] = 8;
+        # tab[tab[1]] = 8;
+        print(tab[3]);
+
+        # tab[3] jest ju¿ sta³¹, nie mo¿e zostaæ zamieniona na sta³¹
+        # guard (tab[3]) in {}
+
+        guard (tab[1]) in
+        {
+            # Nadpisanie tymczasowej sta³ej
+            # tab[1]++;
+        }
+
+        # Ju¿ zmienna
+        tab[1]++;
+        print(tab[1]);
+    }
+
+    # Po wyjœciu z bloku przypisanie dzia³a
+    tab[3]++;
+    print(tab[3]);
+    print(tab[1]);
+    tab[tab[1]] = 4;
+
+    tab[4] = execute int {return tab[1]*2;};
+    btab[2] = (execute int {return tab[1]*2;} as bool);
+    print(btab[2]);
+}
