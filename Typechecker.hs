@@ -243,7 +243,6 @@ interpretA (Assign id exp) = do
     checkIsNotArray(id)
     checkIsNotConst(id)
     val <- evalE exp
-    Just loc <-asks (M.lookup (evalId id))
     val2 <- getVal(id)
     if ((isInt val && isInt val2) || (isBool val && isBool val2))
     then
@@ -259,8 +258,7 @@ interpretA (AArith id AAPlus exp) = do
     if (not $ isInt val1) then
         error("Wyrażenie nie jest wyrażeniem arytmetycznym: " ++ show exp)
     else return ()
-    Just loc <-asks (M.lookup (evalId id))
-    Just val2 <- gets (M.lookup loc)
+    val2 <- getVal id
     if (not $ isInt val2) then
         error("Zły typ zmiennej dla przypisania arytmetycznego: " ++ evalId id)
     else
@@ -279,8 +277,7 @@ interpretA (AIncDec id Increment) = do
     checkIsDeclared(id)
     checkIsNotArray(id)
     checkIsNotConst(id)
-    Just loc <-asks (M.lookup (evalId id))
-    Just val <- gets (M.lookup loc)
+    val <- getVal id
     if (not $ isInt val) then
         error("Zły typ zmiennej dla przypisania arytmetycznego: " ++ evalId id)
     else
