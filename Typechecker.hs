@@ -136,7 +136,7 @@ eval (EAdd exp1 exp2) = do
     val2 <- eval exp2
     if (not $ isInt val1) then
         error("Wyrażenie nie jest wyrażeniem arytmetycznym: " ++ show(exp1))
-    else if (not $ isInt val1) then
+    else if (not $ isInt val2) then
         error("Wyrażenie nie jest wyrażeniem arytmetycznym: " ++ show(exp1))
     else
         return (IVal 1)
