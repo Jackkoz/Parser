@@ -400,10 +400,11 @@ redeclareConst id = do
         CBool val -> do
             error ("Niepoprawny parametr dla guard, identyfikator jest stałą: " ++ evalId(id))
 
-redeclareVar :: Identifier -> Semantics ()
-redeclareVar id = do
-    loc <- takeLocation id
-    val <- getVal id
+redeclareVar :: Loc -> Semantics ()
+redeclareVar loc = do
+--    loc <- takeLocation id
+--    val <- getVal id
+    Just val <- gets (M.lookup loc)
     case val of
         CVal val ->
             modify (M.insert loc (IVal val))
@@ -473,17 +474,16 @@ interpret (SprintS s) = do
     liftIO $ print s
 
 interpret (SGuard ids block) = do
+    locs <- Prelude.mapM takeLocation ids
     env <- makeConst ids
     interpretB block
-    env <- makeVar ids
+    env <- makeVar locs
     return ()
---    interpretB block
---    makeVar ids
     where
     makeConst ids = do
         mapM_ redeclareConst ids
-    makeVar ids = do
-        mapM_ redeclareVar ids
+    makeVar locs = do
+        mapM_ redeclareVar locs
 
 interpret (SFor exp1 exp2 id block) = do
     from <- eval exp1
