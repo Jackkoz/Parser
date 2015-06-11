@@ -1,10 +1,9 @@
 entrypoints Program ;
 
---Prog.       Program     ::=     [TypeDeclaration] [Decl] [FunctionDeclaration] "main" Block ;
 Prog.       Program     ::=     [Decl] [FunctionDeclaration] "main" Block ;
 
-SBlock.		Block 		::=     "{" [Decl] [FunctionDeclaration] [Stmt] "}" ;
-SRBlock. 	RBlock 		::=     "{" [Decl] [FunctionDeclaration] [Stmt] "return" Expression ";" "}" ;
+SBlock.     Block       ::=     "{" [Decl] [FunctionDeclaration] [Stmt] "}" ;
+SRBlock.    RBlock      ::=     "{" [Decl] [FunctionDeclaration] [Stmt] "return" Expression ";" "}" ;
 
 Declr.          Decl    ::=     Type Identifier ;
 DAssign.        Decl    ::=     Type Identifier "=" Expression ;
@@ -12,12 +11,7 @@ DConstDec.      Decl    ::=     "const" Type Identifier "=" Expression ;
 
 terminator      Decl ";" ;
 
---TDef.       TypeDeclaration     ::=     "type" Identifier "is" Type ";" ;
-
---terminator  TypeDeclaration "" ;
-
 FDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" Type  RBlock ;
---PDec.       FunctionDeclaration ::=     "function" Identifier "(" [Arguments] ")" ":" "void" Block ;
 
 terminator  FunctionDeclaration "" ;
 
@@ -28,7 +22,6 @@ Args.       Arguments           ::=     Type Identifier ;
 separator   CallArgs    "," ;
 separator   Arguments   "," ;
 
---SDec.       St      ::=     Decl ";" ;
 SAssign.    Stmt      ::=     Assignment ";"   ;
 SExp.       Stmt      ::=     Expression ";"   ;
 SWhile.     Stmt      ::=     "while" "(" Exp ")" Block ;
