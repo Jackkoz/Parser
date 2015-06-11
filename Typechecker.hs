@@ -151,6 +151,7 @@ eval (EDiv exp1 exp2) = do
     eval (EAdd exp1 exp2)
 
 eval (ECast exp ttype) = do
+    val <- eval exp
     case ttype of
         TInt -> return (IVal 1)
         TBool -> return (VBool True)
