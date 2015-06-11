@@ -1,0 +1,63 @@
+int globalI;
+const int globalCI = 5;
+
+bool globalB;
+const bool globalTrue = true;
+const bool globalFalse = false;
+
+int tab[5];
+bool btab[5];
+
+function fib (int x) : int
+{
+    int val = 1;
+    int previous = 1;
+    from 3 to x as i do
+    {
+        int temp = val;
+        val += previous;
+        previous = temp;
+    }
+
+    return val;
+}
+
+main
+{
+
+    print(globalI);
+    print(globalCI);
+    print(globalB);
+    print(globalTrue);
+    print(globalFalse);
+
+    globalI = 5 * execute int {return tab[1] + 3 * 2 * 2;};
+    print(globalI);
+    print (1 + globalI * 2 * 2);
+    globalI = globalI / globalI;
+    print(globalI);
+    print(globalI / 2 / 2);
+    # Dzielenie przez 0
+    # print(2 / (globalI / 2));
+    btab[1] = globalI == globalI;
+    btab[2] = -(btab[1] == btab[2]);
+    print(btab[1] == btab[2]);
+    print(btab[1] > false && btab[1] == false || true);
+
+    print((btab as bool) && true);
+    print(5 * (-3 + 2 * tab[1]));
+    print(2 * - execute int {int y = 10; return (y + 2) * y;});
+
+    from 2 to 11 as i do
+    {
+        print(fib(i - 1));
+    }
+
+    # print(2/false);
+    # print(true && 2);
+    print(true && true && false);
+    print(true && true && true);
+
+    if (false) {print("Nie");} else if (true) {print("Hurra");} else {print("Nie");}
+    execute int {function p () : bool {print("Koniec"); return true;} p(); return 0;};
+}
