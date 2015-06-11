@@ -17,10 +17,10 @@ main
     print(globalTrue);
     print(globalFalse);
 
-    # Nielegalna próba nadpisania rozmiaru tablicy
+    # Nielegalna prÃ³ba nadpisania rozmiaru tablicy
     # tab = 5;
 
-    # Nielegalna próba nadpisania sta³ej
+    # Nielegalna prÃ³ba nadpisania staÅ‚ej
     # globalCI = 3;
     # globalTrue = false;
     # globalFalse = false;
@@ -28,7 +28,7 @@ main
 
     globalI = 10;
     print(globalI*2);
-    # Z³e typy
+    # ZÅ‚e typy
     # globalI = true;
     # globalB = globalI;
     # globalB = 5;
@@ -40,26 +40,26 @@ main
     guard (tab[tab[1]], btab[5]) in
     {
         print(tab[1]);
-        # W tym momencie tab[3] jest sta³¹
+        # W tym momencie tab[3] jest staÅ‚Ä…
         # tab[3] = 8;
         # tab[tab[1]] = 8;
         print(tab[3]);
 
-        # tab[3] jest ju¿ sta³¹, nie mo¿e zostaæ zamieniona na sta³¹
+        # tab[3] jest juÅ¼ staÅ‚Ä…, nie moÅ¼e zostaÄ‡ zamieniona na staÅ‚Ä…
         # guard (tab[3]) in {}
 
         guard (tab[1]) in
         {
-            # Nadpisanie tymczasowej sta³ej
+            # Nadpisanie tymczasowej staÅ‚ej
             # tab[1]++;
         }
 
-        # Ju¿ zmienna
+        # JuÅ¼ zmienna
         tab[1]++;
         print(tab[1]);
     }
 
-    # Po wyjœciu z bloku przypisanie dzia³a
+    # Po wyjÅ›ciu z bloku przypisanie dziaÅ‚a
     tab[3]++;
     print(tab[3]);
     print(tab[1]);
