@@ -401,6 +401,7 @@ evalDecls (decl:decls) = do
   local (const env') (evalDecls decls)
 
 redeclareConst :: Identifier -> Semantics ()
+redeclareConst (Arr id s) = return ()
 redeclareConst id = do
     checkIsVar(id)
     loc <- takeLocation id
@@ -417,6 +418,7 @@ redeclareConst id = do
         Tab val ->
             error ("Niepoprawny parametr dla guard, identyfikator jest nagłówkiem tablicy: " ++ evalId(id))
 redeclareVar :: Identifier -> Semantics ()
+redeclareVar (Arr id s) = return ()
 redeclareVar id = do
     loc <- takeLocation id
     val <- getVal id
